@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: Student Management
+  
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/student_management
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Server Configuration
+server:
+  port: 8080
+
+# Swagger Configuration
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    disable-swagger-default-url: true
+  api-docs:
+    path: /v3/api-docs
+  show-actuator: false
+  show-login-endpoint: false
+
+# Custom Application Properties
+app:
+  swagger:
+    title: Student Management API
+    description: API documentation for Student Management System
+    version: 1.0
+    contact:
+      name: Student Management Team
+      email: contact@example.com
+
+  # Cors Configuration
+  cors:
+    allowed-origins: http://localhost:3000,http://localhost:8080
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: "*"
+    exposed-headers: Authorization
+    allow-credentials: true
+    max-age: 3600 
