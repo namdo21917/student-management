@@ -50,4 +50,6 @@ public interface CourseRepository extends JpaRepository<Course, String> {
     List<Course> findAllActiveOrderByCreditsDesc();
 
     List<Course> findByTeacherId(String teacherId);
+
+    List<Course> findByNameContainingIgnoreCaseOrCodeContainingIgnoreCase(String name, String code);
 }

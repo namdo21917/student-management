@@ -1,17 +1,14 @@
 package com.study.java.studentmanagement.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @Entity
-@Getter
-@Setter
 @Table(name = "courses")
 public class Course {
     @Id
@@ -25,10 +22,13 @@ public class Course {
     private String code;
 
     @Column(nullable = false)
-    private Integer credit;
+    private int credit;
 
     @Column(name = "major_id")
     private String majorId;
+
+    @Column(name = "major_name")
+    private String majorName;
 
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean deleted;
