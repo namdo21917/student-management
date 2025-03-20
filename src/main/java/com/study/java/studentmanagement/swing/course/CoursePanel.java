@@ -6,7 +6,8 @@ import com.study.java.studentmanagement.model.Teacher;
 import com.study.java.studentmanagement.repository.CourseRepository;
 import com.study.java.studentmanagement.repository.MajorRepository;
 import com.study.java.studentmanagement.repository.TeacherRepository;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -18,8 +19,8 @@ import java.awt.*;
 import java.util.List;
 import java.util.Vector;
 
-@Slf4j
 public class CoursePanel extends JPanel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoursePanel.class);
     private final CourseRepository courseRepository;
     private final MajorRepository majorRepository;
     private final TeacherRepository teacherRepository;
@@ -143,7 +144,7 @@ public class CoursePanel extends JPanel {
             updateTable(coursePage.getContent());
             updatePagination(coursePage.getTotalElements(), coursePage.getTotalPages());
         } catch (Exception e) {
-            log.error("Error loading courses", e);
+            LOGGER.error("Error loading courses", e);
             JOptionPane.showMessageDialog(this,
                     "Error loading courses: " + e.getMessage(),
                     "Error",
@@ -182,7 +183,7 @@ public class CoursePanel extends JPanel {
             updateTable(coursePage.getContent());
             updatePagination(coursePage.getTotalElements(), coursePage.getTotalPages());
         } catch (Exception e) {
-            log.error("Error searching courses", e);
+            LOGGER.error("Error searching courses", e);
             JOptionPane.showMessageDialog(this,
                     "Error searching courses: " + e.getMessage(),
                     "Error",
@@ -217,7 +218,7 @@ public class CoursePanel extends JPanel {
                         JOptionPane.INFORMATION_MESSAGE);
             }
         } catch (Exception e) {
-            log.error("Error adding course", e);
+            LOGGER.error("Error adding course", e);
             JOptionPane.showMessageDialog(this,
                     "Error adding course: " + e.getMessage(),
                     "Error",
@@ -266,7 +267,7 @@ public class CoursePanel extends JPanel {
                         JOptionPane.INFORMATION_MESSAGE);
             }
         } catch (Exception e) {
-            log.error("Error editing course", e);
+            LOGGER.error("Error editing course", e);
             JOptionPane.showMessageDialog(this,
                     "Error editing course: " + e.getMessage(),
                     "Error",
@@ -303,7 +304,7 @@ public class CoursePanel extends JPanel {
                         JOptionPane.INFORMATION_MESSAGE);
             }
         } catch (Exception e) {
-            log.error("Error deleting course", e);
+            LOGGER.error("Error deleting course", e);
             JOptionPane.showMessageDialog(this,
                     "Error deleting course: " + e.getMessage(),
                     "Error",

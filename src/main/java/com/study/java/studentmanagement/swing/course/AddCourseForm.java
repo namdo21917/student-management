@@ -156,7 +156,6 @@ public class AddCourseForm extends JDialog {
             return;
         }
 
-        // Create new course
         Course course = new Course();
         course.setCode(code);
         course.setName(name);
