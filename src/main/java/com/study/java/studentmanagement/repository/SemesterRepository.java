@@ -1,6 +1,8 @@
 package com.study.java.studentmanagement.repository;
 
 import com.study.java.studentmanagement.model.Semester;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -26,4 +28,17 @@ public interface SemesterRepository extends JpaRepository<Semester, String> {
     List<Semester> findAllActiveSemesters();
 
     boolean existsByCode(String code);
+
+    Optional<Semester> findBySemesterAndGroupAndYear(String semester, String group, String year);
+
+    List<Semester> findByActiveTrue();
+
+    @Query("SELECT s FROM Semester s WHERE s.active = true AND " +
+            "(LOWER(s.semester) LIKE LOWER(CONCAT('%', ?1, '%')) OR " +
+            "LOWER(s.group) LIKE LOWER(CONCAT('%', ?1, '%')) OR " +
+            "LOWER(s.year) LIKE LOWER(CONCAT('%', ?1, '%')))")
+    Page<Semester> searchSemesters(String keyword, Pageable pageable);
+
+    @Query("SELECT COUNT(s) FROM Semester s WHERE s.active = true")
+    Long countActiveSemesters();
 }

@@ -21,10 +21,13 @@ public class Semester {
     private String id;
 
     @Column(nullable = false)
-    private String name;
+    private String semester;
 
-    @Column(unique = true, nullable = false)
-    private String code;
+    @Column(nullable = false)
+    private String group;
+
+    @Column(nullable = false)
+    private String year;
 
     @Column(name = "start_date")
     private LocalDateTime startDate;
@@ -32,10 +35,10 @@ public class Semester {
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
-    @Column(name = "is_deleted", columnDefinition = "boolean default false")
-    private boolean deleted;
+    @Column(nullable = false)
+    private boolean active = true;
 
-    @OneToMany(mappedBy = "semesterId", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "semester", fetch = FetchType.LAZY)
     private List<Grade> grades;
 
     @CreationTimestamp
@@ -48,6 +51,6 @@ public class Semester {
 
     @Override
     public String toString() {
-        return name;
+        return semester + " - " + group + " - " + year;
     }
 }

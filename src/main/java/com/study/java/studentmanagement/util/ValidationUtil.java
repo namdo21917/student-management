@@ -48,4 +48,12 @@ public class ValidationUtil {
     public static boolean isValidGrade(Double grade) {
         return grade != null && grade >= 0 && grade <= 10;
     }
+
+    public static boolean isValidMajorCode(String code) {
+        if (code == null || code.isEmpty()) {
+            return false;
+        }
+        // Chỉ cho phép chữ cái in hoa và số
+        return code.matches("^[A-Z0-9]+$");
+    }
 }

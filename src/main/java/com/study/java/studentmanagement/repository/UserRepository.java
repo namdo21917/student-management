@@ -42,4 +42,11 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query("SELECT u FROM User u WHERE u.majorId = ?1 AND u.deleted = false")
     Page<User> findStudentsByMajor(String majorId, Pageable pageable);
+
+    Optional<User> findByUsername(String username);
+
+    boolean existsByUsername(String username);
+
+    @Query("SELECT u FROM User u WHERE u.username = ?#{@securityService.getCurrentUsername()}")
+    User findCurrentUser();
 }

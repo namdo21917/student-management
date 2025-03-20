@@ -65,6 +65,13 @@ public class User {
     @OneToMany(mappedBy = "studentId", fetch = FetchType.LAZY)
     private List<Grade> grades;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "major_id")
+    private Major major;
+
+    @Column(nullable = false)
+    private boolean active = true;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

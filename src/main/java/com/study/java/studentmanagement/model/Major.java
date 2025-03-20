@@ -26,6 +26,12 @@ public class Major {
     @Column(unique = true, nullable = false)
     private String code;
 
+    @Column(length = 500)
+    private String description;
+
+    @Column(nullable = false)
+    private boolean active = true;
+
     @OneToMany(mappedBy = "majorId", fetch = FetchType.LAZY)
     private List<Course> courses;
 
