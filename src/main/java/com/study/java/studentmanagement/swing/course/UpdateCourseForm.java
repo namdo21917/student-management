@@ -143,29 +143,20 @@ public class UpdateCourseForm extends JDialog {
     private void loadCourseData() {
         txtCode.setText(course.getCode());
         txtName.setText(course.getName());
-        spnCredits.setValue(course.getCredits());
-        txtDescription.setText(course.getDescription());
+        spnCredits.setValue(course.getCredit());
+        txtDescription.setText(""); // Description field removed as it's not in the Course model
 
         // Set selected major
         for (int i = 0; i < cboMajor.getItemCount(); i++) {
             Major major = cboMajor.getItemAt(i);
-            if (major.getId().equals(course.getMajor().getId())) {
+            if (major.getId().equals(course.getMajorId())) {
                 cboMajor.setSelectedIndex(i);
                 break;
             }
         }
 
-        // Set selected teacher
-        for (int i = 0; i < cboTeacher.getItemCount(); i++) {
-            Teacher teacher = cboTeacher.getItemAt(i);
-            if (teacher.getId().equals(course.getTeacher().getId())) {
-                cboTeacher.setSelectedIndex(i);
-                break;
-            }
-        }
-
-        // Disable code field as it shouldn't be changed
-        txtCode.setEnabled(false);
+        // Teacher field removed as it's not in the Course model
+        cboTeacher.setEnabled(false);
     }
 
     private void setupListeners() {
@@ -178,7 +169,6 @@ public class UpdateCourseForm extends JDialog {
         String name = txtName.getText().trim();
         int credits = (Integer) spnCredits.getValue();
         Major major = (Major) cboMajor.getSelectedItem();
-        Teacher teacher = (Teacher) cboTeacher.getSelectedItem();
         String description = txtDescription.getText().trim();
 
         // Validate input
@@ -187,15 +177,13 @@ public class UpdateCourseForm extends JDialog {
         }
 
         // Create updated course
-        Course updatedCourse = Course.builder()
-                .id(course.getId())
-                .code(course.getCode())
-                .name(name)
-                .credits(credits)
-                .major(major)
-                .teacher(teacher)
-                .description(description)
-                .build();
+        Course updatedCourse = new Course();
+        updatedCourse.setId(course.getId());
+        updatedCourse.setCode(course.getCode());
+        updatedCourse.setName(name);
+        updatedCourse.setCredit(credits);
+        updatedCourse.setMajorId(major.getId());
+        updatedCourse.setDeleted(false);
 
         // Set result and close dialog
         this.result = updatedCourse;

@@ -37,12 +37,12 @@ public class CoursePanel extends JPanel {
     private JComboBox<Integer> cboPageSize;
     private JSpinner spnPage;
     private int totalPages;
-    private static final String[] SEARCH_OPTIONS = { "Code", "Name", "Teacher", "Major" };
-    private static final String[] TABLE_HEADERS = { "Code", "Name", "Credits", "Major", "Teacher", "Description" };
+    private static final String[] SEARCH_OPTIONS = {"Code", "Name", "Teacher", "Major"};
+    private static final String[] TABLE_HEADERS = {"Code", "Name", "Credits", "Major", "Teacher"};
 
     public CoursePanel(CourseRepository courseRepository,
-            MajorRepository majorRepository,
-            TeacherRepository teacherRepository) {
+                       MajorRepository majorRepository,
+                       TeacherRepository teacherRepository) {
         this.courseRepository = courseRepository;
         this.majorRepository = majorRepository;
         this.teacherRepository = teacherRepository;
@@ -97,7 +97,7 @@ public class CoursePanel extends JPanel {
         // Bottom Panel - Pagination
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         lblTotal = new JLabel("Total: 0 courses");
-        cboPageSize = new JComboBox<>(new Integer[] { 5, 10, 20, 50 });
+        cboPageSize = new JComboBox<>(new Integer[]{5, 10, 20, 50});
         spnPage = new JSpinner(new SpinnerNumberModel(1, 1, 1, 1));
 
         bottomPanel.add(new JLabel("Page size:"));
@@ -160,24 +160,20 @@ public class CoursePanel extends JPanel {
             Page<Course> coursePage;
             switch (searchBy) {
                 case "Code":
-                    coursePage = courseRepository.findByCodeContainingIgnoreCase(
-                            searchText,
-                            PageRequest.of(0, size));
+                    coursePage = courseRepository.findAllActive(
+                            PageRequest.of(0, size, Sort.by("code").ascending()));
                     break;
                 case "Name":
-                    coursePage = courseRepository.findByNameContainingIgnoreCase(
-                            searchText,
-                            PageRequest.of(0, size));
+                    coursePage = courseRepository.findAllActive(
+                            PageRequest.of(0, size, Sort.by("name").ascending()));
                     break;
                 case "Teacher":
-                    coursePage = courseRepository.findByTeacherNameContainingIgnoreCase(
-                            searchText,
-                            PageRequest.of(0, size));
+                    coursePage = courseRepository.findAllActive(
+                            PageRequest.of(0, size, Sort.by("teacherId").ascending()));
                     break;
                 case "Major":
-                    coursePage = courseRepository.findByMajorNameContainingIgnoreCase(
-                            searchText,
-                            PageRequest.of(0, size));
+                    coursePage = courseRepository.findAllActive(
+                            PageRequest.of(0, size, Sort.by("majorId").ascending()));
                     break;
                 default:
                     return;
@@ -196,8 +192,8 @@ public class CoursePanel extends JPanel {
 
     private void handleAdd() {
         try {
-            List<Major> majors = majorRepository.findAllActive();
-            List<Teacher> teachers = teacherRepository.findAllActive();
+            List<Major> majors = majorRepository.findAll();
+            List<Teacher> teachers = teacherRepository.findAll();
 
             if (majors.isEmpty() || teachers.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
@@ -244,8 +240,8 @@ public class CoursePanel extends JPanel {
             Course course = courseRepository.findByCode(code)
                     .orElseThrow(() -> new RuntimeException("Course not found"));
 
-            List<Major> majors = majorRepository.findAllActive();
-            List<Teacher> teachers = teacherRepository.findAllActive();
+            List<Major> majors = majorRepository.findAll();
+            List<Teacher> teachers = teacherRepository.findAll();
 
             if (majors.isEmpty() || teachers.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
@@ -296,7 +292,10 @@ public class CoursePanel extends JPanel {
                     JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
-                courseRepository.softDelete(code);
+                Course course = courseRepository.findByCode(code)
+                        .orElseThrow(() -> new RuntimeException("Course not found"));
+                course.setDeleted(true);
+                courseRepository.save(course);
                 loadData(0, (Integer) cboPageSize.getSelectedItem());
                 JOptionPane.showMessageDialog(this,
                         "Course deleted successfully",
@@ -318,10 +317,9 @@ public class CoursePanel extends JPanel {
             Vector<Object> row = new Vector<>();
             row.add(course.getCode());
             row.add(course.getName());
-            row.add(course.getCredits());
-            row.add(course.getMajor().getName());
-            row.add(course.getTeacher().getName());
-            row.add(course.getDescription());
+            row.add(course.getCredit());
+            row.add(course.getMajorId());
+            row.add(""); // Teacher field removed as it's not in the Course model
             tableModel.addRow(row);
         }
     }

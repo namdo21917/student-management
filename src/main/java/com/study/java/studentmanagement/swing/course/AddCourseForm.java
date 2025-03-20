@@ -157,14 +157,12 @@ public class AddCourseForm extends JDialog {
         }
 
         // Create new course
-        Course course = Course.builder()
-                .code(code)
-                .name(name)
-                .credits(credits)
-                .major(major)
-                .teacher(teacher)
-                .description(description)
-                .build();
+        Course course = new Course();
+        course.setCode(code);
+        course.setName(name);
+        course.setCredit(credits);
+        course.setMajorId(major.getId());
+        course.setDeleted(false);
 
         // Set result and close dialog
         this.result = course;
