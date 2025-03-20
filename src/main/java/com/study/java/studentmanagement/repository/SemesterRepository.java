@@ -41,4 +41,6 @@ public interface SemesterRepository extends JpaRepository<Semester, String> {
 
     @Query("SELECT COUNT(s) FROM Semester s WHERE s.active = true")
     Long countActiveSemesters();
+
+    List<Semester> findAllActive();
 }

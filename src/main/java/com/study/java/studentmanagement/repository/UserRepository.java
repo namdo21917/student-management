@@ -49,4 +49,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query("SELECT u FROM User u WHERE u.username = ?#{@securityService.getCurrentUsername()}")
     User findCurrentUser();
+
+    @Query("SELECT u FROM User u WHERE u.role = 'STUDENT' AND u.deleted = false")
+    List<User> findAllStudents();
 }

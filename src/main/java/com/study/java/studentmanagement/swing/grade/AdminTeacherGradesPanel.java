@@ -19,11 +19,15 @@ import java.util.List;
 @Slf4j
 public class AdminTeacherGradesPanel extends GradePanel {
     private final User currentUser;
+    private final CourseRepository courseRepository;
+    private final SemesterRepository semesterRepository;
+    private final GradeRepository gradeRepository;
     private JComboBox<Course> cboCourse;
     private JComboBox<Semester> cboSemester;
     private JButton btnExport;
     private JButton btnImport;
     private JButton btnStatistics;
+    private int pageSize = 10;
 
     public AdminTeacherGradesPanel(
             GradeRepository gradeRepository,
@@ -33,6 +37,9 @@ public class AdminTeacherGradesPanel extends GradePanel {
             User currentUser) {
         super(gradeRepository, userRepository, courseRepository, semesterRepository);
         this.currentUser = currentUser;
+        this.gradeRepository = gradeRepository;
+        this.courseRepository = courseRepository;
+        this.semesterRepository = semesterRepository;
         addAdditionalControls();
         setupAdditionalListeners();
         loadUserSpecificData();
@@ -78,13 +85,13 @@ public class AdminTeacherGradesPanel extends GradePanel {
         try {
             List<Course> courses;
             if (currentUser.isAdmin()) {
-                courses = getCourseRepository().findAllActive();
+                courses = courseRepository.findAllActive();
             } else {
-                courses = getCourseRepository().findByTeacherId(currentUser.getId());
+                courses = courseRepository.findByTeacherId(currentUser.getId());
             }
             courses.forEach(cboCourse::addItem);
 
-            List<Semester> semesters = getSemesterRepository().findAllActive();
+            List<Semester> semesters = semesterRepository.findAllActive();
             semesters.forEach(cboSemester::addItem);
 
         } catch (Exception e) {
@@ -105,13 +112,13 @@ public class AdminTeacherGradesPanel extends GradePanel {
         }
 
         try {
-            Page<Grade> gradePage = getGradeRepository().findByCourseAndSemester(
+            Page<Grade> gradePage = gradeRepository.findByCourseAndSemester(
                     selectedCourse.getId(),
                     selectedSemester.getId(),
-                    PageRequest.of(0, getPageSize()));
+                    PageRequest.of(0, pageSize));
 
-            updateTable(gradePage.getContent());
-            updatePagination(gradePage.getTotalElements(), gradePage.getTotalPages());
+            updateTableData(gradePage.getContent());
+            updatePaginationData(gradePage.getTotalElements(), gradePage.getTotalPages());
 
         } catch (Exception e) {
             log.error("Error filtering grades", e);
@@ -180,15 +187,15 @@ public class AdminTeacherGradesPanel extends GradePanel {
             }
 
             // Calculate statistics
-            double averageScore = getGradeRepository().calculateAverageScoreByCourseAndSemester(
+            double averageScore = gradeRepository.calculateAverageScoreByCourseAndSemester(
                     selectedCourse.getId(),
                     selectedSemester.getId());
 
-            long totalStudents = getGradeRepository().countByCourseAndSemester(
+            long totalStudents = gradeRepository.countByCourseAndSemester(
                     selectedCourse.getId(),
                     selectedSemester.getId());
 
-            long passedStudents = getGradeRepository().countPassedStudentsByCourseAndSemester(
+            long passedStudents = gradeRepository.countPassedStudentsByCourseAndSemester(
                     selectedCourse.getId(),
                     selectedSemester.getId());
 
@@ -201,7 +208,7 @@ public class AdminTeacherGradesPanel extends GradePanel {
                     Average Score: %.2f
                     """,
                     selectedCourse.getName(),
-                    selectedSemester.getName(),
+                    selectedSemester.getCode(),
                     totalStudents,
                     passedStudents,
                     (totalStudents > 0 ? (passedStudents * 100.0 / totalStudents) : 0),
@@ -229,12 +236,12 @@ public class AdminTeacherGradesPanel extends GradePanel {
         try {
             Page<Grade> gradePage;
             if (selectedCourse != null && selectedSemester != null) {
-                gradePage = getGradeRepository().findByCourseAndSemester(
+                gradePage = gradeRepository.findByCourseAndSemester(
                         selectedCourse.getId(),
                         selectedSemester.getId(),
                         PageRequest.of(page, size));
             } else if (!currentUser.isAdmin()) {
-                gradePage = getGradeRepository().findByTeacherId(
+                gradePage = gradeRepository.findByTeacherId(
                         currentUser.getId(),
                         PageRequest.of(page, size));
             } else {
@@ -242,8 +249,8 @@ public class AdminTeacherGradesPanel extends GradePanel {
                 return;
             }
 
-            updateTable(gradePage.getContent());
-            updatePagination(gradePage.getTotalElements(), gradePage.getTotalPages());
+            updateTableData(gradePage.getContent());
+            updatePaginationData(gradePage.getTotalElements(), gradePage.getTotalPages());
 
         } catch (Exception e) {
             log.error("Error loading grades", e);
@@ -252,5 +259,19 @@ public class AdminTeacherGradesPanel extends GradePanel {
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void updateTableData(List<Grade> grades) {
+        // Implementation for updating table data
+        // This should be implemented based on your table model
+    }
+
+    private void updatePaginationData(long totalElements, int totalPages) {
+        // Implementation for updating pagination data
+        // This should be implemented based on your pagination controls
+    }
+
+    private int getPageSize() {
+        return pageSize;
     }
 }

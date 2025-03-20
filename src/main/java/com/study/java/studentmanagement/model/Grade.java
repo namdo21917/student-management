@@ -19,29 +19,29 @@ public class Grade {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "student_id")
-    private String studentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id", nullable = false)
+    private User student;
 
-    @Column(name = "course_id")
-    private String courseId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
 
-    @Column(name = "semester_id")
-    private String semesterId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "semester_id", nullable = false)
+    private Semester semester;
 
-    @Column(name = "attendance_grade")
-    private Double attendanceGrade;
+    @Column(name = "midterm_score", nullable = false)
+    private double midtermScore;
 
-    @Column(name = "midterm_grade")
-    private Double midtermGrade;
+    @Column(name = "final_score", nullable = false)
+    private double finalScore;
 
-    @Column(name = "final_grade")
-    private Double finalGrade;
+    @Column(name = "average_score", nullable = false)
+    private double averageScore;
 
-    @Column(name = "total_grade")
-    private Double totalGrade;
-
-    @Column(name = "is_deleted", columnDefinition = "boolean default false")
-    private boolean deleted;
+    @Column(nullable = false)
+    private boolean deleted = false;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -51,12 +51,28 @@ public class Grade {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    public User getStudent() {
+        return student;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public Semester getSemester() {
+        return semester;
+    }
+
+    public double getMidtermScore() {
+        return midtermScore;
+    }
+
+    public double getFinalScore() {
+        return finalScore;
+    }
+
     // Custom method to calculate total grade
-    @PrePersist
-    @PreUpdate
-    public void calculateTotalGrade() {
-        if (attendanceGrade != null && midtermGrade != null && finalGrade != null) {
-            this.totalGrade = (attendanceGrade * 0.1) + (midtermGrade * 0.3) + (finalGrade * 0.6);
-        }
+    public double calculateTotalGrade() {
+        return (midtermScore * 0.4) + (finalScore * 0.6);
     }
 }

@@ -53,4 +53,8 @@ public class Semester {
     public String toString() {
         return semester + " - " + group + " - " + year;
     }
+
+    public String getCode() {
+        return semester + " - " + group + " - " + year;
+    }
 }

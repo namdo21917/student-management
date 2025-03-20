@@ -48,4 +48,6 @@ public interface CourseRepository extends JpaRepository<Course, String> {
     // Sắp xếp theo tín chỉ
     @Query("SELECT c FROM Course c WHERE c.deleted = false ORDER BY c.credit DESC")
     List<Course> findAllActiveOrderByCreditsDesc();
+
+    List<Course> findByTeacherId(String teacherId);
 }
