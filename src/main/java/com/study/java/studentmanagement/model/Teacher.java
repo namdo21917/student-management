@@ -1,16 +1,13 @@
 package com.study.java.studentmanagement.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @Entity
 @Table(name = "teachers")
 public class Teacher {
@@ -18,17 +15,20 @@ public class Teacher {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "mgv", unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String mgv;
 
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    @Column(unique = true)
+    @Column
     private String email;
 
+    @Column(name = "is_admin", columnDefinition = "boolean default false")
+    private boolean admin;
+
     @Column(name = "is_gv", columnDefinition = "boolean default true")
-    private boolean isGV;
+    private boolean gv;
 
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean deleted;

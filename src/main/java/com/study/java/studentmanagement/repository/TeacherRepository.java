@@ -1,6 +1,8 @@
 package com.study.java.studentmanagement.repository;
 
 import com.study.java.studentmanagement.model.Teacher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -28,4 +30,7 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
             "LOWER(t.mgv) LIKE LOWER(CONCAT('%', ?1, '%')) OR " +
             "LOWER(t.email) LIKE LOWER(CONCAT('%', ?1, '%')))")
     List<Teacher> searchTeachers(String keyword);
+
+    Page<Teacher> findByFullNameContainingIgnoreCaseOrMgvContainingIgnoreCaseOrEmailContainingIgnoreCase(
+            String fullName, String mgv, String email, Pageable pageable);
 }
