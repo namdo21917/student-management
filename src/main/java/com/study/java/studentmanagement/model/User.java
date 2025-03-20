@@ -25,6 +25,9 @@ public class User {
     @Column(name = "msv", unique = true, nullable = false)
     private String msv;
 
+    @Column(name = "password", nullable = false)
+    private String password;
+
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
