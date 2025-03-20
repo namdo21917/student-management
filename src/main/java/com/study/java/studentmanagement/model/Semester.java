@@ -1,17 +1,13 @@
 package com.study.java.studentmanagement.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @Entity
 @Table(name = "semesters")
 public class Semester {
@@ -28,17 +24,11 @@ public class Semester {
     @Column(nullable = false)
     private String year;
 
-    @Column(name = "start_date")
-    private LocalDateTime startDate;
+    @Column(name = "is_active", columnDefinition = "boolean default true")
+    private boolean active;
 
-    @Column(name = "end_date")
-    private LocalDateTime endDate;
-
-    @Column(nullable = false)
-    private boolean active = true;
-
-    @OneToMany(mappedBy = "semester", fetch = FetchType.LAZY)
-    private List<Grade> grades;
+    @Column(name = "is_deleted", columnDefinition = "boolean default false")
+    private boolean deleted;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -47,13 +37,4 @@ public class Semester {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @Override
-    public String toString() {
-        return semester + " - " + group + " - " + year;
-    }
-
-    public String getCode() {
-        return semester + " - " + group + " - " + year;
-    }
 }

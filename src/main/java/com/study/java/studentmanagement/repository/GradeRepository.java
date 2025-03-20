@@ -60,4 +60,10 @@ public interface GradeRepository extends JpaRepository<Grade, String> {
     @Query("SELECT g FROM Grade g WHERE g.student.name = ?1 AND g.course.name = ?2 AND g.semester.name = ?3 AND g.deleted = false")
     Optional<Grade> findByStudentNameAndCourseNameAndSemesterName(String studentName, String courseName,
             String semesterName);
+
+    Optional<Grade> findByTranscriptIdAndCourseId(String transcriptId, String courseId);
+
+    List<Grade> findByTranscriptId(String transcriptId);
+
+    boolean existsByTranscriptIdAndCourseId(String transcriptId, String courseId);
 }
