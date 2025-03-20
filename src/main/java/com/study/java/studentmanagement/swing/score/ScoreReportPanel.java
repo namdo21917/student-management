@@ -19,6 +19,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class ScoreReportPanel extends JPanel {
@@ -193,15 +194,19 @@ public class ScoreReportPanel extends JPanel {
             String url = buildTranscriptUrl(currentUser.getId(), semesterId);
             ResponseEntity<ApiResponse> response = restTemplate.getForEntity(url, ApiResponse.class);
 
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null
+                    && response.getBody().isSuccess()) {
                 updateTableData(response.getBody());
                 updateStats(response.getBody());
             } else {
-                showError("Lỗi khi tải dữ liệu điểm");
+                String errorMessage = response.getBody() != null ? response.getBody().getMessage()
+                        : "Lỗi không xác định";
+                log.error("API request failed: {}", errorMessage);
+                showError("Lỗi khi tải dữ liệu điểm: " + errorMessage);
             }
         } catch (Exception e) {
             log.error("Error fetching transcript data", e);
-            showError("Lỗi khi tải dữ liệu điểm");
+            showError("Lỗi khi tải dữ liệu điểm: " + e.getMessage());
         }
     }
 
@@ -211,34 +216,52 @@ public class ScoreReportPanel extends JPanel {
     }
 
     private void updateTableData(ApiResponse response) {
-        model.setRowCount(0);
-        List<?> transcriptData = response.getData();
-
-        for (int i = 0; i < transcriptData.size(); i++) {
-            Object item = transcriptData.get(i);
-            // Add row data based on your transcript data structure
-            // This is a placeholder - you need to implement the actual data mapping
-            model.addRow(new Object[] {
-                    i + 1,
-                    "Mã môn học", // Replace with actual data
-                    "Tên môn học", // Replace with actual data
-                    0, // Replace with actual data
-                    0.0, // Replace with actual data
-                    0.0, // Replace with actual data
-                    0.0, // Replace with actual data
-                    "Kết quả" // Replace with actual data
-            });
+        try {
+            model.setRowCount(0);
+            if (response.getData() instanceof List) {
+                List<?> transcriptData = (List<?>) response.getData();
+                for (int i = 0; i < transcriptData.size(); i++) {
+                    Object item = transcriptData.get(i);
+                    if (item instanceof Map) {
+                        Map<?, ?> transcriptItem = (Map<?, ?>) item;
+                        model.addRow(new Object[] {
+                                i + 1,
+                                transcriptItem.get("courseCode"),
+                                transcriptItem.get("courseName"),
+                                transcriptItem.get("credits"),
+                                transcriptItem.get("midtermScore"),
+                                transcriptItem.get("finalScore"),
+                                transcriptItem.get("averageScore"),
+                                transcriptItem.get("status")
+                        });
+                    }
+                }
+            } else {
+                log.warn("Unexpected data type in API response: {}", response.getData().getClass());
+                showError("Định dạng dữ liệu không hợp lệ");
+            }
+        } catch (Exception e) {
+            log.error("Error updating table data", e);
+            showError("Lỗi khi cập nhật dữ liệu bảng");
         }
     }
 
     private void updateStats(ApiResponse response) {
-        // Update statistics based on the response data
-        // This is a placeholder - you need to implement the actual statistics
-        // calculation
-        totalStudentsLabel.setText("Tổng số sinh viên: 0");
-        passedStudentsLabel.setText("Số sinh viên đạt: 0");
-        passRateLabel.setText("Tỷ lệ đạt: 0%");
-        averageScoreLabel.setText("Điểm trung bình: 0.0");
+        try {
+            if (response.getData() instanceof Map) {
+                Map<?, ?> stats = (Map<?, ?>) response.getData();
+                totalStudentsLabel.setText("Tổng số sinh viên: " + stats.get("totalStudents"));
+                passedStudentsLabel.setText("Số sinh viên đạt: " + stats.get("passedStudents"));
+                passRateLabel.setText("Tỷ lệ đạt: " + stats.get("passRate") + "%");
+                averageScoreLabel.setText("Điểm trung bình: " + stats.get("averageScore"));
+            } else {
+                log.warn("Unexpected data type in API response for stats: {}", response.getData().getClass());
+                showError("Định dạng dữ liệu thống kê không hợp lệ");
+            }
+        } catch (Exception e) {
+            log.error("Error updating statistics", e);
+            showError("Lỗi khi cập nhật thống kê");
+        }
     }
 
     private String getSemesterIdFromComboBox(String semesterComboBoxItem) {
@@ -257,10 +280,12 @@ public class ScoreReportPanel extends JPanel {
     }
 
     private void showError(String message) {
-        JOptionPane.showMessageDialog(
-                this,
-                message,
-                "Lỗi",
-                JOptionPane.ERROR_MESSAGE);
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(
+                    this,
+                    message,
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
+        });
     }
 }

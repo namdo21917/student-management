@@ -41,8 +41,9 @@ public class SemesterForm extends JDialog {
     }
 
     private void initializeUI() {
-        setLayout(new BorderLayout());
-        setBorder(new EmptyBorder(10, 10, 10, 10));
+        // Set border for content pane
+        ((JPanel) getContentPane()).setBorder(new EmptyBorder(10, 10, 10, 10));
+        getContentPane().setLayout(new BorderLayout());
 
         // Create form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -58,7 +59,7 @@ public class SemesterForm extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         semesterField = new JTextField();
-        semesterField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Nhập học kỳ");
+        semesterField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập học kỳ");
         formPanel.add(semesterField, gbc);
 
         // Group field
@@ -70,7 +71,7 @@ public class SemesterForm extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         groupField = new JTextField();
-        groupField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Nhập nhóm");
+        groupField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập nhóm");
         formPanel.add(groupField, gbc);
 
         // Year field
@@ -82,7 +83,7 @@ public class SemesterForm extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         yearField = new JTextField();
-        yearField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Nhập năm học");
+        yearField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập năm học");
         formPanel.add(yearField, gbc);
 
         // Start date field

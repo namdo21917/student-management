@@ -38,8 +38,8 @@ public class AddStudentForm extends JDialog {
     private List<Major> majors;
 
     public AddStudentForm(JFrame parent, StudentPanel studentPanel, RestTemplate restTemplate,
-            UserRepository userRepository, TeacherRepository teacherRepository,
-            MajorRepository majorRepository) {
+                          UserRepository userRepository, TeacherRepository teacherRepository,
+                          MajorRepository majorRepository) {
         super(parent, "Thêm sinh viên", true);
         this.restTemplate = restTemplate;
         this.userRepository = userRepository;
@@ -57,8 +57,8 @@ public class AddStudentForm extends JDialog {
     }
 
     private void initializeUI() {
-        setLayout(new BorderLayout());
-        setBorder(new EmptyBorder(10, 10, 10, 10));
+        ((JPanel) getContentPane()).setBorder(new EmptyBorder(10, 10, 10, 10));
+        getContentPane().setLayout(new BorderLayout());
 
         // Create form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -74,7 +74,7 @@ public class AddStudentForm extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         nameField = new JTextField();
-        nameField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Nhập tên sinh viên");
+        nameField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập tên sinh viên");
         formPanel.add(nameField, gbc);
 
         // MSV field
@@ -86,7 +86,7 @@ public class AddStudentForm extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         msvField = new JTextField();
-        msvField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Nhập mã sinh viên");
+        msvField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập mã sinh viên");
         formPanel.add(msvField, gbc);
 
         // Year field
@@ -98,7 +98,7 @@ public class AddStudentForm extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         yearField = new JTextField();
-        yearField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Nhập năm học");
+        yearField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập năm học");
         formPanel.add(yearField, gbc);
 
         // Teacher field
@@ -121,7 +121,7 @@ public class AddStudentForm extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         genderField = new JTextField();
-        genderField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Nhập giới tính");
+        genderField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập giới tính");
         formPanel.add(genderField, gbc);
 
         // Class field
@@ -133,7 +133,7 @@ public class AddStudentForm extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         classField = new JTextField();
-        classField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Nhập lớp");
+        classField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập lớp");
         formPanel.add(classField, gbc);
 
         // Email field
@@ -145,7 +145,7 @@ public class AddStudentForm extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         emailField = new JTextField();
-        emailField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Nhập email");
+        emailField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập email");
         formPanel.add(emailField, gbc);
 
         // Major field
@@ -321,8 +321,8 @@ public class AddStudentForm extends JDialog {
     }
 
     public static void showDialog(JFrame parent, StudentPanel studentPanel, RestTemplate restTemplate,
-            UserRepository userRepository, TeacherRepository teacherRepository,
-            MajorRepository majorRepository) {
+                                  UserRepository userRepository, TeacherRepository teacherRepository,
+                                  MajorRepository majorRepository) {
         AddStudentForm dialog = new AddStudentForm(parent, studentPanel, restTemplate,
                 userRepository, teacherRepository, majorRepository);
         dialog.setVisible(true);

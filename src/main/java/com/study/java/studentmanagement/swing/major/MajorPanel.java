@@ -93,7 +93,7 @@ public class MajorPanel extends JPanel {
 
         searchField = new JTextField(20);
         searchField.setPreferredSize(new Dimension(200, 35));
-        searchField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Tìm kiếm...");
+        searchField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Tìm kiếm...");
 
         searchCriteria = new JComboBox<>(new String[] { "Mã ngành", "Tên ngành", "Mô tả" });
         searchCriteria.setPreferredSize(new Dimension(120, 35));
@@ -221,7 +221,8 @@ public class MajorPanel extends JPanel {
     }
 
     private void handleAdd() {
-        UpdateMajorForm.showDialog(this, null, majorRepository, restTemplate);
+        UpdateMajorForm.showDialog((JFrame) SwingUtilities.getWindowAncestor(this), null, majorRepository,
+                restTemplate);
     }
 
     private void handleEdit() {
@@ -235,7 +236,8 @@ public class MajorPanel extends JPanel {
         try {
             Major major = majorRepository.findByCode(majorCode)
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy ngành"));
-            UpdateMajorForm.showDialog(this, major, majorRepository, restTemplate);
+            UpdateMajorForm.showDialog((JFrame) SwingUtilities.getWindowAncestor(this), major, majorRepository,
+                    restTemplate);
         } catch (Exception e) {
             log.error("Error finding major", e);
             showNotification("Lỗi khi tìm ngành: " + e.getMessage(), "error");

@@ -12,10 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +54,7 @@ public class TeacherPanel extends JPanel {
 
         // Search field
         searchField = new JTextField(20);
-        searchField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Tìm kiếm giáo viên...");
+        searchField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Tìm kiếm giáo viên...");
         buttonPanel.add(searchField);
 
         // Search button

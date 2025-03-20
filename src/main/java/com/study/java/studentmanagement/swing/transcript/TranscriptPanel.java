@@ -66,7 +66,7 @@ public class TranscriptPanel extends JPanel {
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         searchField = new JTextField(20);
-        searchField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Tìm kiếm...");
+        searchField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Tìm kiếm...");
         searchButton = createStyledButton("Tìm kiếm", new Color(88, 86, 214));
         reloadButton = createStyledButton("Tải lại", new Color(88, 86, 214));
         addTranscriptButton = createStyledButton("Thêm bảng điểm", new Color(40, 167, 69));

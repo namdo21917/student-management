@@ -35,8 +35,8 @@ public class StudentDetail extends JDialog {
     }
 
     private void initializeUI(User user) {
-        setLayout(new BorderLayout());
-        setBorder(new EmptyBorder(10, 10, 10, 10));
+        ((JPanel) getContentPane()).setBorder(new EmptyBorder(10, 10, 10, 10));
+        getContentPane().setLayout(new BorderLayout());
 
         // Create content panel
         JPanel contentPanel = new JPanel(new GridBagLayout());

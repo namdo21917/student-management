@@ -61,8 +61,8 @@ public class UpdateStudentForm extends JDialog {
     }
 
     private void initializeUI() {
-        setLayout(new BorderLayout());
-        setBorder(new EmptyBorder(10, 10, 10, 10));
+        ((JPanel) getContentPane()).setBorder(new EmptyBorder(10, 10, 10, 10));
+        getContentPane().setLayout(new BorderLayout());
 
         // Create form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -78,7 +78,7 @@ public class UpdateStudentForm extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         nameField = new JTextField(user.getFullName());
-        nameField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Nhập tên sinh viên");
+        nameField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập tên sinh viên");
         formPanel.add(nameField, gbc);
 
         // MSV field
@@ -90,7 +90,7 @@ public class UpdateStudentForm extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         msvField = new JTextField(user.getMsv());
-        msvField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Nhập mã sinh viên");
+        msvField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập mã sinh viên");
         formPanel.add(msvField, gbc);
 
         // Year field
@@ -102,7 +102,7 @@ public class UpdateStudentForm extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         yearField = new JTextField(user.getYear());
-        yearField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Nhập năm học");
+        yearField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập năm học");
         formPanel.add(yearField, gbc);
 
         // Teacher field
@@ -125,7 +125,7 @@ public class UpdateStudentForm extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         genderField = new JTextField(user.getGender());
-        genderField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Nhập giới tính");
+        genderField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập giới tính");
         formPanel.add(genderField, gbc);
 
         // Class field
@@ -137,7 +137,7 @@ public class UpdateStudentForm extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         classField = new JTextField(user.getClassName());
-        classField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Nhập lớp");
+        classField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập lớp");
         formPanel.add(classField, gbc);
 
         // Email field
@@ -149,7 +149,7 @@ public class UpdateStudentForm extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         emailField = new JTextField(user.getEmail());
-        emailField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Nhập email");
+        emailField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập email");
         formPanel.add(emailField, gbc);
 
         // Major field

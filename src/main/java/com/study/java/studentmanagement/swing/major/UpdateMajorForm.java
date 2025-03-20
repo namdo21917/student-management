@@ -42,7 +42,7 @@ public class UpdateMajorForm extends JDialog {
 
     private void initializeUI() {
         setLayout(new BorderLayout());
-        setBorder(new EmptyBorder(10, 10, 10, 10));
+        ((JPanel) getContentPane()).setBorder(new EmptyBorder(10, 10, 10, 10));
 
         // Create form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -219,7 +219,7 @@ public class UpdateMajorForm extends JDialog {
     }
 
     public static Major showDialog(JFrame parent, Major major, MajorRepository majorRepository,
-            RestTemplate restTemplate) {
+                                   RestTemplate restTemplate) {
         UpdateMajorForm dialog = new UpdateMajorForm(parent, major, majorRepository, restTemplate);
         dialog.setVisible(true);
         return dialog.isConfirmed ? dialog.major : null;

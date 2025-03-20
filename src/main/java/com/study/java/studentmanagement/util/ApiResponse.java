@@ -1,48 +1,23 @@
 package com.study.java.studentmanagement.util;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.Setter;
 
-import java.time.LocalDateTime;
-
+@Setter
+@Getter
 @Data
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
-public class ApiResponse<T> {
-//    private boolean success;
-//    private String message;
-//    private T data;
-//    private HttpStatus status;
-//    @Builder.Default
-//    private LocalDateTime timestamp = LocalDateTime.now();
-//
-//    public static <T> ApiResponse<T> success(T data) {
-//        return ApiResponse.<T>builder()
-//                .success(true)
-//                .data(data)
-//                .status(HttpStatus.OK)
-//                .message("Success")
-//                .build();
-//    }
-//
-//    public static <T> ApiResponse<T> success(T data, String message) {
-//        return ApiResponse.<T>builder()
-//                .success(true)
-//                .data(data)
-//                .status(HttpStatus.OK)
-//                .message(message)
-//                .build();
-//    }
-//
-//    public static <T> ApiResponse<T> error(String message, HttpStatus status) {
-//        return ApiResponse.<T>builder()
-//                .success(false)
-//                .message(message)
-//                .status(status)
-//                .build();
-//    }
+public class ApiResponse {
+    private boolean success;
+    private String message;
+    private Object data;
+
+    public ApiResponse(boolean success, String message, Object data) {
+        this.success = success;
+        this.message = message;
+        this.data = data;
+    }
+
 }

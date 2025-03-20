@@ -71,7 +71,7 @@ public class SemesterPanel extends JPanel {
         searchPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
 
         searchTextField = new JTextField(20);
-        searchTextField.putClientProperty(FlatClientProperties.TEXT_FIELD_PLACEHOLDER, "Tìm kiếm...");
+        searchTextField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Tìm kiếm...");
 
         searchComboBox = new JComboBox<>(new String[] { "Tất cả", "Học kỳ", "Nhóm", "Năm học" });
         searchComboBox.setSelectedIndex(0);
