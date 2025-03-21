@@ -8,14 +8,12 @@ import com.study.java.studentmanagement.model.User;
 import com.study.java.studentmanagement.repository.MajorRepository;
 import com.study.java.studentmanagement.repository.TeacherRepository;
 import com.study.java.studentmanagement.repository.UserRepository;
+import com.study.java.studentmanagement.service.ApiService;
 import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -31,7 +29,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class StudentPanel extends JPanel {
-    private final RestTemplate restTemplate;
+    private final ApiService apiService;
     private final UserRepository userRepository;
     private final TeacherRepository teacherRepository;
     private final MajorRepository majorRepository;
@@ -46,9 +44,9 @@ public class StudentPanel extends JPanel {
     private List<Major> majors;
     private List<Teacher> teachers;
 
-    public StudentPanel(RestTemplate restTemplate, UserRepository userRepository,
+    public StudentPanel(ApiService apiService, UserRepository userRepository,
             TeacherRepository teacherRepository, MajorRepository majorRepository) {
-        this.restTemplate = restTemplate;
+        this.apiService = apiService;
         this.userRepository = userRepository;
         this.teacherRepository = teacherRepository;
         this.majorRepository = majorRepository;
@@ -150,15 +148,13 @@ public class StudentPanel extends JPanel {
     public void loadData() {
         try {
             // Lấy danh sách sinh viên từ API
-            ResponseEntity<ApiResponse<List<UserResponse>>> response = restTemplate.exchange(
+            ApiResponse<List<UserResponse>> response = apiService.get(
                     "/api/user/getAll",
-                    HttpMethod.GET,
-                    null,
                     new ParameterizedTypeReference<ApiResponse<List<UserResponse>>>() {
                     });
 
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                List<UserResponse> userResponses = response.getBody().getData();
+            if (response != null) {
+                List<UserResponse> userResponses = response.getData();
                 students = convertToUsers(userResponses);
                 majors = majorRepository.findAll();
                 teachers = teacherRepository.findAll();
@@ -174,15 +170,14 @@ public class StudentPanel extends JPanel {
         String keyword = searchField.getText().trim();
         if (!keyword.isEmpty()) {
             try {
-                ResponseEntity<ApiResponse<List<UserResponse>>> response = restTemplate.exchange(
+                ApiResponse<List<UserResponse>> response = apiService.post(
                         "/api/user/searchStudents?keyword=" + keyword,
-                        HttpMethod.POST,
                         null,
                         new ParameterizedTypeReference<ApiResponse<List<UserResponse>>>() {
                         });
 
-                if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                    List<UserResponse> userResponses = response.getBody().getData();
+                if (response != null) {
+                    List<UserResponse> userResponses = response.getData();
                     students = convertToUsers(userResponses);
                     studentsTableModel.setStudents(students);
                     if (students.isEmpty()) {
@@ -245,7 +240,7 @@ public class StudentPanel extends JPanel {
         AddStudentForm.showDialog(
                 (JFrame) SwingUtilities.getWindowAncestor(this),
                 this,
-                restTemplate,
+                apiService,
                 userRepository,
                 teacherRepository,
                 majorRepository);
@@ -254,24 +249,23 @@ public class StudentPanel extends JPanel {
     private void handleDelete(User student) {
         int option = JOptionPane.showConfirmDialog(
                 this,
-                "Bạn có chắc chắn muốn xóa sinh viên " + student.getFullName() + " không?",
+                "Bạn có chắc chắn muốn xóa sinh viên này?",
                 "Xác nhận xóa",
-                JOptionPane.YES_NO_OPTION);
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
 
         if (option == JOptionPane.YES_OPTION) {
             try {
-                ResponseEntity<ApiResponse<Void>> response = restTemplate.exchange(
+                ApiResponse<Void> response = apiService.delete(
                         "/api/user/delete/" + student.getId(),
-                        HttpMethod.DELETE,
-                        null,
                         new ParameterizedTypeReference<ApiResponse<Void>>() {
                         });
 
-                if (response.getStatusCode() == HttpStatus.OK) {
+                if (response != null) {
                     showSuccess("Xóa sinh viên thành công");
                     loadData();
                 } else {
-                    showError("Xóa sinh viên thất bại");
+                    showError("Lỗi khi xóa sinh viên");
                 }
             } catch (Exception e) {
                 log.error("Error deleting student", e);
@@ -293,7 +287,7 @@ public class StudentPanel extends JPanel {
                 (JFrame) SwingUtilities.getWindowAncestor(this),
                 student,
                 this,
-                restTemplate,
+                apiService,
                 userRepository,
                 teacherRepository,
                 majorRepository);

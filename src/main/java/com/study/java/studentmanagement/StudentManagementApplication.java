@@ -15,11 +15,6 @@ public class StudentManagementApplication {
         // Configure Spring Boot to not use headless mode
         System.setProperty("java.awt.headless", "false");
 
-        // Start Spring Boot application
-        ConfigurableApplicationContext context = new SpringApplicationBuilder(StudentManagementApplication.class)
-                .headless(false)
-                .run(args);
-
         // Launch Swing UI
         SwingUtilities.invokeLater(() -> {
             try {

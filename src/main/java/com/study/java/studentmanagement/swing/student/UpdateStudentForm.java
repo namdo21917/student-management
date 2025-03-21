@@ -7,13 +7,11 @@ import com.study.java.studentmanagement.model.User;
 import com.study.java.studentmanagement.repository.MajorRepository;
 import com.study.java.studentmanagement.repository.TeacherRepository;
 import com.study.java.studentmanagement.repository.UserRepository;
+import com.study.java.studentmanagement.service.ApiService;
 import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -23,7 +21,7 @@ import java.util.List;
 @Slf4j
 @Component
 public class UpdateStudentForm extends JDialog {
-    private final RestTemplate restTemplate;
+    private final ApiService apiService;
     private final UserRepository userRepository;
     private final TeacherRepository teacherRepository;
     private final MajorRepository majorRepository;
@@ -42,10 +40,10 @@ public class UpdateStudentForm extends JDialog {
     private final User user;
 
     public UpdateStudentForm(JFrame parent, User user, StudentPanel studentPanel,
-            RestTemplate restTemplate, UserRepository userRepository,
+            ApiService apiService, UserRepository userRepository,
             TeacherRepository teacherRepository, MajorRepository majorRepository) {
         super(parent, "Cập nhật sinh viên", true);
-        this.restTemplate = restTemplate;
+        this.apiService = apiService;
         this.userRepository = userRepository;
         this.teacherRepository = teacherRepository;
         this.majorRepository = majorRepository;
@@ -251,24 +249,22 @@ public class UpdateStudentForm extends JDialog {
             }
 
             // Call API to update
-            HttpEntity<User> requestEntity = new HttpEntity<>(user);
-            ResponseEntity<ApiResponse<User>> response = restTemplate.exchange(
-                    "/api/user/update/" + user.getId(),
-                    org.springframework.http.HttpMethod.PUT,
-                    requestEntity,
-                    new org.springframework.core.ParameterizedTypeReference<ApiResponse<User>>() {
+            ApiResponse<User> response = apiService.put(
+                    "/api/users/update/" + user.getId(),
+                    user,
+                    new ParameterizedTypeReference<ApiResponse<User>>() {
                     });
 
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            if (response != null) {
                 showSuccess("Cập nhật sinh viên thành công");
                 studentPanel.loadData();
                 dispose();
             } else {
-                showError("Cập nhật thông tin thất bại");
+                showError("Lỗi khi cập nhật sinh viên");
             }
         } catch (Exception e) {
             log.error("Error updating student", e);
-            showError("Lỗi khi cập nhật thông tin: " + e.getMessage());
+            showError("Lỗi khi cập nhật sinh viên: " + e.getMessage());
         }
     }
 
@@ -335,10 +331,10 @@ public class UpdateStudentForm extends JDialog {
     }
 
     public static void showDialog(JFrame parent, User user, StudentPanel studentPanel,
-            RestTemplate restTemplate, UserRepository userRepository,
+            ApiService apiService, UserRepository userRepository,
             TeacherRepository teacherRepository, MajorRepository majorRepository) {
         UpdateStudentForm dialog = new UpdateStudentForm(parent, user, studentPanel,
-                restTemplate, userRepository, teacherRepository, majorRepository);
+                apiService, userRepository, teacherRepository, majorRepository);
         dialog.setVisible(true);
     }
 }

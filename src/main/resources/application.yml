@@ -17,10 +17,15 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
 
 # Server Configuration
 server:
   port: 8080
+
+# API Configuration
+api:
+  base-url: http://localhost:8080
 
 # Swagger Configuration
 springdoc:

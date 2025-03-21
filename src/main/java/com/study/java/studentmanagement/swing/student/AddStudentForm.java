@@ -7,11 +7,11 @@ import com.study.java.studentmanagement.model.User;
 import com.study.java.studentmanagement.repository.MajorRepository;
 import com.study.java.studentmanagement.repository.TeacherRepository;
 import com.study.java.studentmanagement.repository.UserRepository;
+import com.study.java.studentmanagement.service.ApiService;
 import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @Slf4j
 public class AddStudentForm extends JDialog {
-    private final RestTemplate restTemplate;
+    private final ApiService apiService;
     private final UserRepository userRepository;
     private final TeacherRepository teacherRepository;
     private final MajorRepository majorRepository;
@@ -37,11 +37,11 @@ public class AddStudentForm extends JDialog {
     private List<Teacher> teachers;
     private List<Major> majors;
 
-    public AddStudentForm(JFrame parent, StudentPanel studentPanel, RestTemplate restTemplate,
-                          UserRepository userRepository, TeacherRepository teacherRepository,
-                          MajorRepository majorRepository) {
+    public AddStudentForm(JFrame parent, StudentPanel studentPanel, ApiService apiService,
+            UserRepository userRepository, TeacherRepository teacherRepository,
+            MajorRepository majorRepository) {
         super(parent, "Thêm sinh viên", true);
-        this.restTemplate = restTemplate;
+        this.apiService = apiService;
         this.userRepository = userRepository;
         this.teacherRepository = teacherRepository;
         this.majorRepository = majorRepository;
@@ -240,21 +240,22 @@ public class AddStudentForm extends JDialog {
             }
 
             // Call API to save
-            ResponseEntity<ApiResponse> response = restTemplate.postForEntity(
+            ApiResponse<User> response = apiService.post(
                     "/api/users/save",
                     user,
-                    ApiResponse.class);
+                    new ParameterizedTypeReference<ApiResponse<User>>() {
+                    });
 
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            if (response != null) {
                 showSuccess("Thêm sinh viên thành công");
                 studentPanel.loadData();
                 dispose();
             } else {
-                showError("Lưu thông tin thất bại");
+                showError("Lỗi khi thêm sinh viên");
             }
         } catch (Exception e) {
             log.error("Error saving student", e);
-            showError("Lỗi khi lưu thông tin: " + e.getMessage());
+            showError("Lỗi khi thêm sinh viên: " + e.getMessage());
         }
     }
 
@@ -320,10 +321,10 @@ public class AddStudentForm extends JDialog {
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public static void showDialog(JFrame parent, StudentPanel studentPanel, RestTemplate restTemplate,
-                                  UserRepository userRepository, TeacherRepository teacherRepository,
-                                  MajorRepository majorRepository) {
-        AddStudentForm dialog = new AddStudentForm(parent, studentPanel, restTemplate,
+    public static void showDialog(JFrame parent, StudentPanel studentPanel, ApiService apiService,
+            UserRepository userRepository, TeacherRepository teacherRepository,
+            MajorRepository majorRepository) {
+        AddStudentForm dialog = new AddStudentForm(parent, studentPanel, apiService,
                 userRepository, teacherRepository, majorRepository);
         dialog.setVisible(true);
     }
