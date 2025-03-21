@@ -1,17 +1,14 @@
 package com.study.java.studentmanagement.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @Entity
 @Table(name = "transcripts")
 public class Transcript {
@@ -19,39 +16,26 @@ public class Transcript {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "student_id")
+    @Column(name = "student_id", nullable = false)
     private String studentId;
 
-    @Column(name = "student_name")
+    @Column(name = "student_name", nullable = false)
     private String studentName;
 
-    @Column(name = "student_code")
+    @Column(name = "student_code", nullable = false)
     private String studentCode;
 
-    @Column(name = "semester_id")
+    @Column(name = "semester_id", nullable = false)
     private String semesterId;
 
-    @Column(name = "semester_name")
+    @Column(name = "semester_name", nullable = false)
     private String semesterName;
 
-    private String course;
-
-    @Column(name = "mid_score")
-    private Double midScore;
-
-    @Column(name = "final_score")
-    private Double finalScore;
-
-    @Column(name = "average_score")
-    private Double averageScore;
-
-    private String status;
-
-    @Column(name = "is_deleted", columnDefinition = "boolean default false")
-    private boolean deleted;
-
-    @OneToMany(mappedBy = "studentId", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "transcriptId", cascade = CascadeType.ALL)
     private List<Grade> grades;
+
+    @Column(name = "deleted")
+    private boolean deleted = false;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -60,18 +44,4 @@ public class Transcript {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    public Transcript(String studentId, String semesterId) {
-        this.studentId = studentId;
-        this.semesterId = semesterId;
-    }
-
-    @PrePersist
-    @PreUpdate
-    public void calculateAverageScore() {
-        if (midScore != null && finalScore != null) {
-            this.averageScore = (midScore * 0.3) + (finalScore * 0.7);
-            this.status = (this.averageScore >= 4.0) ? "Passed" : "Failed";
-        }
-    }
 }

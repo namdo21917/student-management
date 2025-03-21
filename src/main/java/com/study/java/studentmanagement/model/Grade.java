@@ -15,20 +15,34 @@ public class Grade {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @ManyToOne
+    @JoinColumn(name = "student_id", nullable = false)
+    private User student;
+
     @Column(name = "course_id", nullable = false)
     private String courseId;
 
-    @Column(name = "transcript_id", nullable = false)
-    private String transcriptId;
+    @Column(name = "course_name", nullable = false)
+    private String courseName;
 
-    @Column(name = "mid_score", nullable = false)
+    @Column(name = "mid_score")
     private double midScore;
 
-    @Column(name = "final_score", nullable = false)
+    @Column(name = "final_score")
     private double finalScore;
 
-    @Column(name = "is_deleted", columnDefinition = "boolean default false")
-    private boolean deleted;
+    @Column(name = "average_score")
+    private double averageScore;
+
+    @Column(nullable = false)
+    private String status;
+
+    @ManyToOne
+    @JoinColumn(name = "transcript_id", nullable = false)
+    private Transcript transcript;
+
+    @Column(name = "deleted")
+    private boolean deleted = false;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

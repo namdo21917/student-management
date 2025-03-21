@@ -102,7 +102,7 @@ public class AuthService {
         response.setMgv(teacher.getMgv());
         response.setFullName(teacher.getFullName());
         response.setEmail(teacher.getEmail());
-        response.setGv(teacher.isGV());
+        response.setGV(teacher.isGv());
 
         return response;
     }

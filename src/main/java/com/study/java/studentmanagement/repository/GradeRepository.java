@@ -1,6 +1,7 @@
 package com.study.java.studentmanagement.repository;
 
 import com.study.java.studentmanagement.model.Grade;
+import com.study.java.studentmanagement.model.Transcript;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -66,4 +67,6 @@ public interface GradeRepository extends JpaRepository<Grade, String> {
     List<Grade> findByTranscriptId(String transcriptId);
 
     boolean existsByTranscriptIdAndCourseId(String transcriptId, String courseId);
+
+    boolean existsByCourseIdAndTranscriptAndDeletedFalse(String courseId, Transcript transcript);
 }
