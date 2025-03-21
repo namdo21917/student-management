@@ -9,6 +9,7 @@ import com.study.java.studentmanagement.model.User;
 import com.study.java.studentmanagement.repository.*;
 import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -64,7 +65,7 @@ public class TranscriptDetail extends JDialog {
 
         // Title Panel
         JPanel titlePanel = new JPanel(new BorderLayout());
-        User student = userRepository.findById(transcript.getStudentId()).orElse(null);
+        User student = userRepository.findById(transcript.getStudent().getId()).orElse(null);
         String title = String.format("Bảng điểm sinh viên %s - %s",
                 student != null ? student.getFullName() : "Không xác định",
                 student != null ? student.getMsv() : "Không xác định");
@@ -196,8 +197,11 @@ public class TranscriptDetail extends JDialog {
                 double finalScore = Double.parseDouble(finalScoreField.getText());
 
                 Grade newGrade = new Grade();
-                newGrade.setTranscriptId(transcript.getId());
+                newGrade.setTranscript(transcript);
                 newGrade.setCourseId(selectedCourse.getId());
+                newGrade.setCourseName(selectedCourse.getName());
+                newGrade.setStudent(transcript.getStudent());
+                newGrade.setSemester(semesterRepository.findById(transcript.getSemesterId()).orElse(null));
                 newGrade.setMidScore(midScore);
                 newGrade.setFinalScore(finalScore);
 
@@ -302,7 +306,7 @@ public class TranscriptDetail extends JDialog {
                     ResponseEntity<ApiResponse> response = restTemplate.exchange(
                             "/api/grades/" + grade.getId(),
                             org.springframework.http.HttpMethod.PUT,
-                            grade,
+                            new HttpEntity<>(grade),
                             ApiResponse.class);
 
                     if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
@@ -397,22 +401,21 @@ public class TranscriptDetail extends JDialog {
             setLayout(new FlowLayout(FlowLayout.CENTER, 5, 0));
             editButton = createStyledButton("Sửa", new Color(88, 86, 214));
             deleteButton = createStyledButton("Xóa", new Color(220, 53, 69));
-
             add(editButton);
             add(deleteButton);
         }
 
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
+        public java.awt.Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column) {
             if (isSelected) {
-                setBackground(new Color(88, 86, 214));
-                setForeground(Color.WHITE);
+                setBackground(table.getSelectionBackground());
+                setForeground(table.getSelectionForeground());
             } else {
-                setBackground(Color.WHITE);
-                setForeground(Color.BLACK);
+                setBackground(table.getBackground());
+                setForeground(table.getForeground());
             }
-            return this;
+            return (java.awt.Component) this;
         }
     }
 
@@ -442,14 +445,14 @@ public class TranscriptDetail extends JDialog {
         }
 
         @Override
-        public Component getTableCellEditorComponent(JTable table, Object value,
+        public java.awt.Component getTableCellEditorComponent(JTable table, Object value,
                 boolean isSelected, int row, int column) {
             if (isSelected) {
-                panel.setBackground(new Color(88, 86, 214));
+                panel.setBackground(table.getSelectionBackground());
             } else {
-                panel.setBackground(Color.WHITE);
+                panel.setBackground(table.getBackground());
             }
-            return panel;
+            return (java.awt.Component) panel;
         }
 
         @Override

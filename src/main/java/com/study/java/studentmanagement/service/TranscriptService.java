@@ -70,7 +70,7 @@ public class TranscriptService {
         }
 
         Transcript transcript = new Transcript();
-        transcript.setStudentId(student.getId());
+        transcript.setStudent(student);
         transcript.setStudentName(student.getFullName());
         transcript.setStudentCode(student.getMsv());
         transcript.setSemesterId(semester.getId());
@@ -103,7 +103,7 @@ public class TranscriptService {
             }
         }
 
-        transcript.setStudentId(student.getId());
+        transcript.setStudent(student);
         transcript.setStudentName(student.getFullName());
         transcript.setStudentCode(student.getMsv());
         transcript.setSemesterId(semester.getId());
@@ -132,7 +132,7 @@ public class TranscriptService {
     private TranscriptResponse convertToResponse(Transcript transcript) {
         TranscriptResponse response = new TranscriptResponse();
         response.setId(transcript.getId());
-        response.setStudentId(transcript.getStudentId());
+        response.setStudentId(transcript.getStudent().getId());
         response.setStudentName(transcript.getStudentName());
         response.setStudentCode(transcript.getStudentCode());
         response.setSemesterId(transcript.getSemesterId());

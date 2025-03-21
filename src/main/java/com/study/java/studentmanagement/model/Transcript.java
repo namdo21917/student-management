@@ -16,8 +16,9 @@ public class Transcript {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "student_id", nullable = false)
-    private String studentId;
+    @ManyToOne
+    @JoinColumn(name = "student_id", nullable = false)
+    private User student;
 
     @Column(name = "student_name", nullable = false)
     private String studentName;
@@ -31,7 +32,7 @@ public class Transcript {
     @Column(name = "semester_name", nullable = false)
     private String semesterName;
 
-    @OneToMany(mappedBy = "transcriptId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "transcript", cascade = CascadeType.ALL)
     private List<Grade> grades;
 
     @Column(name = "deleted")

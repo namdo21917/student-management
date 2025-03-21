@@ -1,6 +1,7 @@
 package com.study.java.studentmanagement.swing.student;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.study.java.studentmanagement.dto.user.UserResponse;
 import com.study.java.studentmanagement.model.Major;
 import com.study.java.studentmanagement.model.Teacher;
 import com.study.java.studentmanagement.model.User;
@@ -9,6 +10,8 @@ import com.study.java.studentmanagement.repository.TeacherRepository;
 import com.study.java.studentmanagement.repository.UserRepository;
 import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -16,7 +19,9 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +45,7 @@ public class StudentPanel extends JPanel {
     private List<Teacher> teachers;
 
     public StudentPanel(RestTemplate restTemplate, UserRepository userRepository,
-            TeacherRepository teacherRepository, MajorRepository majorRepository) {
+                        TeacherRepository teacherRepository, MajorRepository majorRepository) {
         this.restTemplate = restTemplate;
         this.userRepository = userRepository;
         this.teacherRepository = teacherRepository;
@@ -142,13 +147,24 @@ public class StudentPanel extends JPanel {
 
     public void loadData() {
         try {
-            students = userRepository.findAll();
-            majors = majorRepository.findAll();
-            teachers = teacherRepository.findAll();
-            studentsTableModel.setStudents(students);
+            // Lấy danh sách sinh viên từ API
+            ResponseEntity<ApiResponse<List<UserResponse>>> response = restTemplate.exchange(
+                    "/api/user/getAll",
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<ApiResponse<List<UserResponse>>>() {
+                    });
+
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                List<UserResponse> userResponses = response.getBody().getData();
+                students = convertToUsers(userResponses);
+                majors = majorRepository.findAll();
+                teachers = teacherRepository.findAll();
+                studentsTableModel.setStudents(students);
+            }
         } catch (Exception e) {
             log.error("Error loading data", e);
-            showError("Lỗi khi tải dữ liệu");
+            showError("Lỗi khi tải dữ liệu: " + e.getMessage());
         }
     }
 
@@ -156,11 +172,16 @@ public class StudentPanel extends JPanel {
         String keyword = searchField.getText().trim();
         if (!keyword.isEmpty()) {
             try {
-                ResponseEntity<List<User>> response = restTemplate.getForEntity(
-                        "/api/users/search?keyword=" + keyword,
-                        List.class);
+                ResponseEntity<ApiResponse<List<UserResponse>>> response = restTemplate.exchange(
+                        "/api/user/searchStudents?keyword=" + keyword,
+                        HttpMethod.POST,
+                        null,
+                        new ParameterizedTypeReference<ApiResponse<List<UserResponse>>>() {
+                        });
+
                 if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                    students = response.getBody();
+                    List<UserResponse> userResponses = response.getBody().getData();
+                    students = convertToUsers(userResponses);
                     studentsTableModel.setStudents(students);
                     if (students.isEmpty()) {
                         showError("Không tìm thấy sinh viên");
@@ -168,11 +189,28 @@ public class StudentPanel extends JPanel {
                 }
             } catch (Exception e) {
                 log.error("Error searching students", e);
-                showError("Lỗi khi tìm kiếm sinh viên");
+                showError("Lỗi khi tìm kiếm sinh viên: " + e.getMessage());
             }
         } else {
             loadData();
         }
+    }
+
+    private List<User> convertToUsers(List<UserResponse> userResponses) {
+        List<User> users = new ArrayList<>();
+        for (UserResponse response : userResponses) {
+            User user = new User();
+            user.setId(response.getId());
+            user.setFullName(response.getFullName());
+            user.setMsv(response.getMsv());
+            user.setEmail(response.getEmail());
+            user.setGvcn(response.getGvcn());
+            user.setMajorId(response.getMajorId());
+            user.setClassName(response.getClassName());
+            user.setDeleted(response.isDeleted());
+            users.add(user);
+        }
+        return users;
     }
 
     private void handleRefresh() {
@@ -200,13 +238,14 @@ public class StudentPanel extends JPanel {
 
         if (option == JOptionPane.YES_OPTION) {
             try {
-                ResponseEntity<ApiResponse> response = restTemplate.exchange(
-                        "/api/users/" + student.getId(),
-                        org.springframework.http.HttpMethod.DELETE,
+                ResponseEntity<ApiResponse<Void>> response = restTemplate.exchange(
+                        "/api/user/delete/" + student.getId(),
+                        HttpMethod.DELETE,
                         null,
-                        ApiResponse.class);
+                        new ParameterizedTypeReference<ApiResponse<Void>>() {
+                        });
 
-                if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                if (response.getStatusCode() == HttpStatus.OK) {
                     showSuccess("Xóa sinh viên thành công");
                     loadData();
                 } else {
@@ -214,7 +253,7 @@ public class StudentPanel extends JPanel {
                 }
             } catch (Exception e) {
                 log.error("Error deleting student", e);
-                showError("Lỗi khi xóa sinh viên");
+                showError("Lỗi khi xóa sinh viên: " + e.getMessage());
             }
         }
     }
@@ -255,8 +294,8 @@ public class StudentPanel extends JPanel {
     }
 
     private class StudentsTableModel extends AbstractTableModel {
-        private final String[] columnNames = { "STT", "Tên", "Mã sinh viên", "GVCN", "Chuyên ngành", "Lớp",
-                "Hành động" };
+        private final String[] columnNames = {"STT", "Tên", "Mã sinh viên", "GVCN", "Chuyên ngành", "Lớp",
+                "Hành động"};
         private List<User> students = new ArrayList<>();
 
         public void setStudents(List<User> students) {
@@ -321,84 +360,82 @@ public class StudentPanel extends JPanel {
         }
     }
 
-    private class ActionRenderer extends JPanel implements TableCellRenderer {
-        public ActionRenderer() {
-            setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-            JButton viewButton = createActionButton("Xem chi tiết");
-            add(viewButton);
-        }
-
-        private JButton createActionButton(String text) {
-            JButton button = new JButton(text);
-            button.setFont(new Font("Arial", Font.PLAIN, 12));
-            button.setFocusPainted(false);
-            button.setOpaque(true);
-            button.setBorderPainted(true);
-            button.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
-            return button;
-        }
-
+    private class ActionRenderer extends DefaultTableCellRenderer {
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus,
-                int row, int column) {
-            return this;
+        public java.awt.Component getTableCellRendererComponent(JTable table, Object value,
+                                                                boolean isSelected, boolean hasFocus, int row, int column) {
+            JLabel label = new JLabel("Tùy chọn");
+            label.setHorizontalAlignment(JLabel.CENTER);
+            if (isSelected) {
+                label.setBackground(table.getSelectionBackground());
+                label.setForeground(table.getSelectionForeground());
+            } else {
+                label.setBackground(table.getBackground());
+                label.setForeground(table.getForeground());
+            }
+            label.setOpaque(true);
+            return label;
         }
     }
 
-    private class ActionEditor extends AbstractCellEditor implements TableCellEditor {
-        private final JPanel panel;
-        private final JButton editButton;
-        private final JButton deleteButton;
-        private final JButton viewButton;
+    private class ActionEditor extends DefaultCellEditor {
         private User currentStudent;
 
         public ActionEditor() {
-            panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
-            editButton = createActionButton("Sửa");
-            deleteButton = createActionButton("Xóa");
-            viewButton = createActionButton("Xem chi tiết");
+            super(new JTextField());
+            setClickCountToStart(1);
+        }
 
-            editButton.addActionListener(e -> {
-                handleEdit(currentStudent);
-                fireEditingStopped();
-            });
+        @Override
+        public java.awt.Component getTableCellEditorComponent(JTable table, Object value,
+                                                              boolean isSelected, int row, int column) {
+            currentStudent = studentsTableModel.students.get(row);
 
-            deleteButton.addActionListener(e -> {
-                handleDelete(currentStudent);
-                fireEditingStopped();
-            });
+            JPopupMenu popup = new JPopupMenu();
 
-            viewButton.addActionListener(e -> {
+            JMenuItem viewItem = new JMenuItem("Xem chi tiết");
+            viewItem.addActionListener(e -> {
                 handleView(currentStudent);
                 fireEditingStopped();
             });
 
-            panel.add(editButton);
-            panel.add(deleteButton);
-            panel.add(viewButton);
-        }
+            JMenuItem editItem = new JMenuItem("Sửa");
+            editItem.addActionListener(e -> {
+                handleEdit(currentStudent);
+                fireEditingStopped();
+            });
 
-        private JButton createActionButton(String text) {
-            JButton button = new JButton(text);
-            button.setFont(new Font("Arial", Font.PLAIN, 12));
-            button.setFocusPainted(false);
-            button.setOpaque(true);
-            button.setBorderPainted(true);
-            button.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
-            return button;
-        }
+            JMenuItem deleteItem = new JMenuItem("Xóa");
+            deleteItem.addActionListener(e -> {
+                handleDelete(currentStudent);
+                fireEditingStopped();
+            });
 
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value,
-                boolean isSelected, int row, int column) {
-            currentStudent = studentsTableModel.students.get(row);
-            return panel;
+            popup.add(viewItem);
+            popup.add(editItem);
+            popup.add(deleteItem);
+
+            SwingUtilities.invokeLater(() -> {
+                popup.show(table, table.getCellRect(row, column, true).x,
+                        table.getCellRect(row, column, true).y + table.getRowHeight(row));
+            });
+
+            JLabel label = new JLabel("Tùy chọn");
+            label.setHorizontalAlignment(JLabel.CENTER);
+            if (isSelected) {
+                label.setBackground(table.getSelectionBackground());
+                label.setForeground(table.getSelectionForeground());
+            } else {
+                label.setBackground(table.getBackground());
+                label.setForeground(table.getForeground());
+            }
+            label.setOpaque(true);
+            return label;
         }
 
         @Override
         public Object getCellEditorValue() {
-            return panel;
+            return "Tùy chọn";
         }
     }
 }

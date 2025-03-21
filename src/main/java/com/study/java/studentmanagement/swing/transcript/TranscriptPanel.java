@@ -7,6 +7,8 @@ import com.study.java.studentmanagement.model.User;
 import com.study.java.studentmanagement.repository.SemesterRepository;
 import com.study.java.studentmanagement.repository.TranscriptRepository;
 import com.study.java.studentmanagement.repository.UserRepository;
+import com.study.java.studentmanagement.repository.CourseRepository;
+import com.study.java.studentmanagement.repository.GradeRepository;
 import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,8 @@ public class TranscriptPanel extends JPanel {
     private final TranscriptRepository transcriptRepository;
     private final UserRepository userRepository;
     private final SemesterRepository semesterRepository;
+    private final CourseRepository courseRepository;
+    private final GradeRepository gradeRepository;
 
     private JTextField searchField;
     private JButton searchButton;
@@ -42,11 +46,15 @@ public class TranscriptPanel extends JPanel {
     public TranscriptPanel(RestTemplate restTemplate,
             TranscriptRepository transcriptRepository,
             UserRepository userRepository,
-            SemesterRepository semesterRepository) {
+            SemesterRepository semesterRepository,
+            CourseRepository courseRepository,
+            GradeRepository gradeRepository) {
         this.restTemplate = restTemplate;
         this.transcriptRepository = transcriptRepository;
         this.userRepository = userRepository;
         this.semesterRepository = semesterRepository;
+        this.courseRepository = courseRepository;
+        this.gradeRepository = gradeRepository;
 
         initializeUI();
         loadData();
@@ -137,13 +145,13 @@ public class TranscriptPanel extends JPanel {
             int stt = 1;
 
             for (Transcript transcript : transcripts) {
-                String studentName = getStudentNameById(transcript.getStudentId());
+                String studentName = getStudentNameById(transcript.getStudent().getId());
                 String semesterName = getSemesterNameById(transcript.getSemesterId());
 
                 tableModel.addRow(new Object[] {
                         stt++,
                         transcript.getId(),
-                        getStudentCodeById(transcript.getStudentId()),
+                        getStudentCodeById(transcript.getStudent().getId()),
                         studentName != null ? studentName : "Không xác định",
                         semesterName != null ? semesterName : "Không xác định",
                         "Xem, Sửa, Xóa"
@@ -163,8 +171,8 @@ public class TranscriptPanel extends JPanel {
             int stt = 1;
 
             for (Transcript transcript : transcripts) {
-                String studentName = getStudentNameById(transcript.getStudentId());
-                String studentCode = getStudentCodeById(transcript.getStudentId());
+                String studentName = getStudentNameById(transcript.getStudent().getId());
+                String studentCode = getStudentCodeById(transcript.getStudent().getId());
                 String semesterName = getSemesterNameById(transcript.getSemesterId());
 
                 if (studentName != null && studentName.toLowerCase().contains(keyword) ||
@@ -206,7 +214,9 @@ public class TranscriptPanel extends JPanel {
                     restTemplate,
                     transcriptRepository,
                     userRepository,
-                    semesterRepository);
+                    semesterRepository,
+                    courseRepository,
+                    gradeRepository);
         }
     }
 
@@ -306,16 +316,16 @@ public class TranscriptPanel extends JPanel {
         }
 
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
+        public java.awt.Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column) {
             if (isSelected) {
-                setBackground(new Color(88, 86, 214));
-                setForeground(Color.WHITE);
+                setBackground(table.getSelectionBackground());
+                setForeground(table.getSelectionForeground());
             } else {
-                setBackground(Color.WHITE);
-                setForeground(Color.BLACK);
+                setBackground(table.getBackground());
+                setForeground(table.getForeground());
             }
-            return this;
+            return (java.awt.Component) this;
         }
     }
 
@@ -353,14 +363,14 @@ public class TranscriptPanel extends JPanel {
         }
 
         @Override
-        public Component getTableCellEditorComponent(JTable table, Object value,
+        public java.awt.Component getTableCellEditorComponent(JTable table, Object value,
                 boolean isSelected, int row, int column) {
             if (isSelected) {
-                panel.setBackground(new Color(88, 86, 214));
+                panel.setBackground(table.getSelectionBackground());
             } else {
-                panel.setBackground(Color.WHITE);
+                panel.setBackground(table.getBackground());
             }
-            return panel;
+            return (java.awt.Component) panel;
         }
 
         @Override

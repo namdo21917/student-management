@@ -9,6 +9,10 @@ public class GradeResponse {
     private String courseId;
     private String courseName;
     private String transcriptId;
+    private String semesterId;
+    private String semesterName;
+    private String studentId;
+    private String studentName;
     private double midScore;
     private double finalScore;
     private double averageScore;

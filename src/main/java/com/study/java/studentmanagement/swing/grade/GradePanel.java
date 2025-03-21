@@ -199,7 +199,7 @@ public class GradePanel extends JPanel {
         try {
             List<User> students = userRepository.findAllStudents();
             List<Course> courses = courseRepository.findAllActive();
-            List<Semester> semesters = semesterRepository.findAllActive();
+            List<Semester> semesters = semesterRepository.findAllByActive();
 
             if (students.isEmpty() || courses.isEmpty() || semesters.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
@@ -307,11 +307,11 @@ public class GradePanel extends JPanel {
         for (Grade grade : grades) {
             Vector<Object> row = new Vector<>();
             row.add(grade.getStudent().getFullName());
-            row.add(grade.getCourse().getName());
+            row.add(grade.getCourseName());
             row.add(grade.getSemester().getSemester());
-            row.add(grade.getMidtermScore());
+            row.add(grade.getMidScore());
             row.add(grade.getFinalScore());
-            row.add(calculateAverage(grade.getMidtermScore(), grade.getFinalScore()));
+            row.add(calculateAverage(grade.getMidScore(), grade.getFinalScore()));
             tableModel.addRow(row);
         }
     }

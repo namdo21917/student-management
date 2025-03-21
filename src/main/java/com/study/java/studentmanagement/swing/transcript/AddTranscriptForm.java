@@ -1,6 +1,7 @@
 package com.study.java.studentmanagement.swing.transcript;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.study.java.studentmanagement.dto.transcript.TranscriptRequest;
 import com.study.java.studentmanagement.model.Semester;
 import com.study.java.studentmanagement.model.Transcript;
 import com.study.java.studentmanagement.model.User;
@@ -9,6 +10,7 @@ import com.study.java.studentmanagement.repository.TranscriptRepository;
 import com.study.java.studentmanagement.repository.UserRepository;
 import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -139,11 +141,20 @@ public class AddTranscriptForm extends JDialog {
             String semesterId = getSemesterIdByDisplay(semesterDisplay);
 
             if (studentId != null && semesterId != null) {
-                Transcript newTranscript = new Transcript(studentId, semesterId);
-                ResponseEntity<ApiResponse> response = restTemplate.postForEntity(
-                        "/api/transcripts",
-                        newTranscript,
-                        ApiResponse.class);
+                // Create request object
+                TranscriptRequest request = new TranscriptRequest();
+                request.setStudentId(studentId);
+                request.setSemesterId(semesterId);
+
+                HttpEntity<TranscriptRequest> requestEntity = new org.springframework.http.HttpEntity<>(
+                        request);
+
+                ResponseEntity<ApiResponse<Transcript>> response = restTemplate.exchange(
+                        "/api/transcript/create",
+                        org.springframework.http.HttpMethod.POST,
+                        requestEntity,
+                        new org.springframework.core.ParameterizedTypeReference<ApiResponse<Transcript>>() {
+                        });
 
                 if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                     showSuccess("Thêm bảng điểm thành công");
@@ -157,7 +168,7 @@ public class AddTranscriptForm extends JDialog {
             }
         } catch (Exception e) {
             log.error("Error adding transcript", e);
-            showError("Lỗi khi thêm bảng điểm");
+            showError("Lỗi khi thêm bảng điểm: " + e.getMessage());
         }
     }
 

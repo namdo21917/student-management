@@ -1,6 +1,7 @@
 package com.study.java.studentmanagement.swing.transcript;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.study.java.studentmanagement.dto.transcript.TranscriptRequest;
 import com.study.java.studentmanagement.model.Semester;
 import com.study.java.studentmanagement.model.Transcript;
 import com.study.java.studentmanagement.model.User;
@@ -9,6 +10,7 @@ import com.study.java.studentmanagement.repository.TranscriptRepository;
 import com.study.java.studentmanagement.repository.UserRepository;
 import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -135,10 +137,12 @@ public class EditTranscriptForm extends JDialog {
 
     private void populateFields() {
         if (transcript != null) {
-            String studentDisplay = getStudentDisplayById(transcript.getStudentId());
-            String semesterDisplay = getSemesterDisplayById(transcript.getSemesterId());
-
+            // Get student display from transcript
+            String studentDisplay = transcript.getStudentName() + " - " + transcript.getStudentCode();
             studentComboBox.setSelectedItem(studentDisplay);
+
+            // Get semester display from transcript
+            String semesterDisplay = transcript.getSemesterName();
             semesterComboBox.setSelectedItem(semesterDisplay);
         }
     }
@@ -152,28 +156,45 @@ public class EditTranscriptForm extends JDialog {
             String semesterId = getSemesterIdByDisplay(semesterDisplay);
 
             if (studentId != null && semesterId != null) {
-                Transcript updatedTranscript = new Transcript(studentId, semesterId);
-                updatedTranscript.setId(transcript.getId());
+                // Get student and semester information
+                User student = userRepository.findById(studentId).orElse(null);
+                Semester semester = semesterRepository.findById(semesterId).orElse(null);
 
-                ResponseEntity<ApiResponse> response = restTemplate.exchange(
-                        "/api/transcripts/" + transcript.getId(),
-                        org.springframework.http.HttpMethod.PUT,
-                        updatedTranscript,
-                        ApiResponse.class);
+                if (student != null && semester != null) {
+                    // Create request object
+                    TranscriptRequest request = new TranscriptRequest();
+                    request.setStudentId(studentId);
+                    request.setStudentName(student.getFullName());
+                    request.setStudentCode(student.getMsv());
+                    request.setSemesterId(semesterId);
+                    request.setSemesterName(
+                            semester.getSemester() + " - " + semester.getGroup() + " - Năm học: " + semester.getYear());
 
-                if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                    showSuccess("Cập nhật bảng điểm thành công");
-                    parentPanel.loadData();
-                    dispose();
+                    HttpEntity<TranscriptRequest> requestEntity = new HttpEntity<>(request);
+
+                    ResponseEntity<ApiResponse<Transcript>> response = restTemplate.exchange(
+                            "/api/transcript/update/" + transcript.getId(),
+                            org.springframework.http.HttpMethod.PUT,
+                            requestEntity,
+                            new org.springframework.core.ParameterizedTypeReference<ApiResponse<Transcript>>() {
+                            });
+
+                    if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                        showSuccess("Cập nhật bảng điểm thành công");
+                        parentPanel.loadData();
+                        dispose();
+                    } else {
+                        showError("Cập nhật bảng điểm thất bại");
+                    }
                 } else {
-                    showError("Cập nhật bảng điểm thất bại");
+                    showError("Không tìm thấy thông tin sinh viên hoặc học kỳ");
                 }
             } else {
                 showError("Dữ liệu không hợp lệ");
             }
         } catch (Exception e) {
             log.error("Error updating transcript", e);
-            showError("Lỗi khi cập nhật bảng điểm");
+            showError("Lỗi khi cập nhật bảng điểm: " + e.getMessage());
         }
     }
 

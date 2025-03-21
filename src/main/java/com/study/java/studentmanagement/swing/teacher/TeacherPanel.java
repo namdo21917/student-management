@@ -128,11 +128,20 @@ public class TeacherPanel extends JPanel {
 
     public void loadData() {
         try {
-            teachers = teacherRepository.findAll();
-            teachersTableModel.setTeachers(teachers);
+            ResponseEntity<ApiResponse<List<Teacher>>> response = restTemplate.exchange(
+                    "/api/teacher/getAll",
+                    org.springframework.http.HttpMethod.GET,
+                    null,
+                    new org.springframework.core.ParameterizedTypeReference<ApiResponse<List<Teacher>>>() {
+                    });
+
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                teachers = response.getBody().getData();
+                teachersTableModel.setTeachers(teachers);
+            }
         } catch (Exception e) {
             log.error("Error loading data", e);
-            showError("Lỗi khi tải dữ liệu");
+            showError("Lỗi khi tải dữ liệu: " + e.getMessage());
         }
     }
 
@@ -140,11 +149,15 @@ public class TeacherPanel extends JPanel {
         String keyword = searchField.getText().trim();
         if (!keyword.isEmpty()) {
             try {
-                ResponseEntity<List<Teacher>> response = restTemplate.getForEntity(
-                        "/api/teachers/search?keyword=" + keyword,
-                        List.class);
+                ResponseEntity<ApiResponse<List<Teacher>>> response = restTemplate.exchange(
+                        "/api/teacher/search?keyword=" + keyword,
+                        org.springframework.http.HttpMethod.GET,
+                        null,
+                        new org.springframework.core.ParameterizedTypeReference<ApiResponse<List<Teacher>>>() {
+                        });
+
                 if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                    teachers = response.getBody();
+                    teachers = response.getBody().getData();
                     teachersTableModel.setTeachers(teachers);
                     if (teachers.isEmpty()) {
                         showError("Không tìm thấy giáo viên");
@@ -152,7 +165,7 @@ public class TeacherPanel extends JPanel {
                 }
             } catch (Exception e) {
                 log.error("Error searching teachers", e);
-                showError("Lỗi khi tìm kiếm giáo viên");
+                showError("Lỗi khi tìm kiếm giáo viên: " + e.getMessage());
             }
         } else {
             loadData();
@@ -166,11 +179,7 @@ public class TeacherPanel extends JPanel {
     }
 
     private void handleAdd() {
-        AddTeacherForm.showDialog(
-                (JFrame) SwingUtilities.getWindowAncestor(this),
-                this,
-                restTemplate,
-                teacherRepository);
+        showInfo("Chức năng đang được phát triển");
     }
 
     private void handleDelete(Teacher teacher) {
@@ -182,13 +191,14 @@ public class TeacherPanel extends JPanel {
 
         if (option == JOptionPane.YES_OPTION) {
             try {
-                ResponseEntity<ApiResponse> response = restTemplate.exchange(
-                        "/api/teachers/" + teacher.getId(),
+                ResponseEntity<ApiResponse<Void>> response = restTemplate.exchange(
+                        "/api/teacher/delete/" + teacher.getId(),
                         org.springframework.http.HttpMethod.DELETE,
                         null,
-                        ApiResponse.class);
+                        new org.springframework.core.ParameterizedTypeReference<ApiResponse<Void>>() {
+                        });
 
-                if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                if (response.getStatusCode() == HttpStatus.OK) {
                     showSuccess("Xóa giáo viên thành công");
                     loadData();
                 } else {
@@ -196,24 +206,17 @@ public class TeacherPanel extends JPanel {
                 }
             } catch (Exception e) {
                 log.error("Error deleting teacher", e);
-                showError("Lỗi khi xóa giáo viên");
+                showError("Lỗi khi xóa giáo viên: " + e.getMessage());
             }
         }
     }
 
     private void handleView(Teacher teacher) {
-        TeacherDetail.showDialog(
-                (JFrame) SwingUtilities.getWindowAncestor(this),
-                teacher);
+        showInfo("Chức năng đang được phát triển");
     }
 
     private void handleEdit(Teacher teacher) {
-        UpdateTeacherForm.showDialog(
-                (JFrame) SwingUtilities.getWindowAncestor(this),
-                teacher,
-                this,
-                restTemplate,
-                teacherRepository);
+        showInfo("Chức năng đang được phát triển");
     }
 
     private void showError(String message) {
@@ -229,6 +232,14 @@ public class TeacherPanel extends JPanel {
                 this,
                 message,
                 "Thành công",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void showInfo(String message) {
+        JOptionPane.showMessageDialog(
+                this,
+                message,
+                "Thông báo",
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -280,84 +291,82 @@ public class TeacherPanel extends JPanel {
         }
     }
 
-    private class ActionRenderer extends JPanel implements TableCellRenderer {
-        public ActionRenderer() {
-            setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-            JButton viewButton = createActionButton("Xem chi tiết");
-            add(viewButton);
-        }
-
-        private JButton createActionButton(String text) {
-            JButton button = new JButton(text);
-            button.setFont(new Font("Arial", Font.PLAIN, 12));
-            button.setFocusPainted(false);
-            button.setOpaque(true);
-            button.setBorderPainted(true);
-            button.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
-            return button;
-        }
-
+    private class ActionRenderer extends DefaultTableCellRenderer {
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus,
-                int row, int column) {
-            return this;
+        public java.awt.Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
+            JLabel label = new JLabel("Tùy chọn");
+            label.setHorizontalAlignment(JLabel.CENTER);
+            if (isSelected) {
+                label.setBackground(table.getSelectionBackground());
+                label.setForeground(table.getSelectionForeground());
+            } else {
+                label.setBackground(table.getBackground());
+                label.setForeground(table.getForeground());
+            }
+            label.setOpaque(true);
+            return label;
         }
     }
 
-    private class ActionEditor extends AbstractCellEditor implements TableCellEditor {
-        private final JPanel panel;
-        private final JButton editButton;
-        private final JButton deleteButton;
-        private final JButton viewButton;
+    private class ActionEditor extends DefaultCellEditor {
         private Teacher currentTeacher;
 
         public ActionEditor() {
-            panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
-            editButton = createActionButton("Sửa");
-            deleteButton = createActionButton("Xóa");
-            viewButton = createActionButton("Xem chi tiết");
+            super(new JTextField());
+            setClickCountToStart(1);
+        }
 
-            editButton.addActionListener(e -> {
-                handleEdit(currentTeacher);
-                fireEditingStopped();
-            });
+        @Override
+        public java.awt.Component getTableCellEditorComponent(JTable table, Object value,
+                boolean isSelected, int row, int column) {
+            currentTeacher = teachersTableModel.teachers.get(row);
 
-            deleteButton.addActionListener(e -> {
-                handleDelete(currentTeacher);
-                fireEditingStopped();
-            });
+            JPopupMenu popup = new JPopupMenu();
 
-            viewButton.addActionListener(e -> {
+            JMenuItem viewItem = new JMenuItem("Xem chi tiết");
+            viewItem.addActionListener(e -> {
                 handleView(currentTeacher);
                 fireEditingStopped();
             });
 
-            panel.add(editButton);
-            panel.add(deleteButton);
-            panel.add(viewButton);
-        }
+            JMenuItem editItem = new JMenuItem("Sửa");
+            editItem.addActionListener(e -> {
+                handleEdit(currentTeacher);
+                fireEditingStopped();
+            });
 
-        private JButton createActionButton(String text) {
-            JButton button = new JButton(text);
-            button.setFont(new Font("Arial", Font.PLAIN, 12));
-            button.setFocusPainted(false);
-            button.setOpaque(true);
-            button.setBorderPainted(true);
-            button.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
-            return button;
-        }
+            JMenuItem deleteItem = new JMenuItem("Xóa");
+            deleteItem.addActionListener(e -> {
+                handleDelete(currentTeacher);
+                fireEditingStopped();
+            });
 
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value,
-                boolean isSelected, int row, int column) {
-            currentTeacher = teachersTableModel.teachers.get(row);
-            return panel;
+            popup.add(viewItem);
+            popup.add(editItem);
+            popup.add(deleteItem);
+
+            SwingUtilities.invokeLater(() -> {
+                popup.show(table, table.getCellRect(row, column, true).x,
+                        table.getCellRect(row, column, true).y + table.getRowHeight(row));
+            });
+
+            JLabel label = new JLabel("Tùy chọn");
+            label.setHorizontalAlignment(JLabel.CENTER);
+            if (isSelected) {
+                label.setBackground(table.getSelectionBackground());
+                label.setForeground(table.getSelectionForeground());
+            } else {
+                label.setBackground(table.getBackground());
+                label.setForeground(table.getForeground());
+            }
+            label.setOpaque(true);
+            return label;
         }
 
         @Override
         public Object getCellEditorValue() {
-            return panel;
+            return "Tùy chọn";
         }
     }
 }

@@ -5,9 +5,11 @@ import com.study.java.studentmanagement.dto.grade.GradeRequest;
 import com.study.java.studentmanagement.dto.grade.GradeResponse;
 import com.study.java.studentmanagement.model.Course;
 import com.study.java.studentmanagement.model.Grade;
+import com.study.java.studentmanagement.model.Semester;
 import com.study.java.studentmanagement.model.Transcript;
 import com.study.java.studentmanagement.repository.CourseRepository;
 import com.study.java.studentmanagement.repository.GradeRepository;
+import com.study.java.studentmanagement.repository.SemesterRepository;
 import com.study.java.studentmanagement.repository.TranscriptRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class GradeService {
     private final CourseService courseService;
     private final TranscriptRepository transcriptRepository;
     private final CourseRepository courseRepository;
+    private final SemesterRepository semesterRepository;
 
     public List<GradeResponse> getAllGrades() {
         return gradeRepository.findAll().stream()
@@ -42,6 +45,10 @@ public class GradeService {
         Transcript transcript = transcriptRepository.findById(request.getTranscriptId())
                 .orElseThrow(() -> new RuntimeException("Transcript not found"));
 
+        // Get semester from transcript
+        Semester semester = semesterRepository.findById(transcript.getSemesterId())
+                .orElseThrow(() -> new RuntimeException("Semester not found"));
+
         // Validate course exists
         Course course = courseRepository.findById(request.getCourseId())
                 .orElseThrow(() -> new RuntimeException("Course not found"));
@@ -52,7 +59,7 @@ public class GradeService {
         }
 
         Grade grade = new Grade();
-        updateGradeFromRequest(grade, request, transcript, course);
+        updateGradeFromRequest(grade, request, transcript, semester, course);
         calculateGrade(grade);
         return convertToResponse(gradeRepository.save(grade));
     }
@@ -65,6 +72,10 @@ public class GradeService {
         Transcript transcript = transcriptRepository.findById(request.getTranscriptId())
                 .orElseThrow(() -> new RuntimeException("Transcript not found"));
 
+        // Get semester from transcript
+        Semester semester = semesterRepository.findById(transcript.getSemesterId())
+                .orElseThrow(() -> new RuntimeException("Semester not found"));
+
         // Validate course exists
         Course course = courseRepository.findById(request.getCourseId())
                 .orElseThrow(() -> new RuntimeException("Course not found"));
@@ -75,7 +86,7 @@ public class GradeService {
             throw new RuntimeException("Grade already exists for this course in the transcript");
         }
 
-        updateGradeFromRequest(grade, request, transcript, course);
+        updateGradeFromRequest(grade, request, transcript, semester, course);
         calculateGrade(grade);
         return convertToResponse(gradeRepository.save(grade));
     }
@@ -87,10 +98,13 @@ public class GradeService {
         gradeRepository.save(grade);
     }
 
-    private void updateGradeFromRequest(Grade grade, GradeRequest request, Transcript transcript, Course course) {
+    private void updateGradeFromRequest(Grade grade, GradeRequest request, Transcript transcript, Semester semester,
+            Course course) {
         grade.setCourseId(course.getId());
         grade.setCourseName(course.getName());
         grade.setTranscript(transcript);
+        grade.setSemester(semester);
+        grade.setStudent(transcript.getStudent());
         grade.setMidScore(request.getMidScore());
         grade.setFinalScore(request.getFinalScore());
     }
@@ -107,6 +121,10 @@ public class GradeService {
         response.setCourseId(grade.getCourseId());
         response.setCourseName(grade.getCourseName());
         response.setTranscriptId(grade.getTranscript().getId());
+        response.setSemesterId(grade.getSemester().getId());
+        response.setSemesterName(buildSemesterName(grade.getSemester()));
+        response.setStudentId(grade.getStudent().getId());
+        response.setStudentName(grade.getStudent().getFullName());
         response.setMidScore(grade.getMidScore());
         response.setFinalScore(grade.getFinalScore());
         response.setAverageScore(grade.getAverageScore());
@@ -118,5 +136,12 @@ public class GradeService {
         response.setCourse(courseResponse);
 
         return response;
+    }
+
+    private String buildSemesterName(Semester semester) {
+        return String.format("%s - %s - Năm học: %s",
+                semester.getSemester(),
+                semester.getGroup(),
+                semester.getYear());
     }
 }

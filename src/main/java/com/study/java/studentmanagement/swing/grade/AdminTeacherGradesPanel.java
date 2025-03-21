@@ -91,7 +91,7 @@ public class AdminTeacherGradesPanel extends GradePanel {
             }
             courses.forEach(cboCourse::addItem);
 
-            List<Semester> semesters = semesterRepository.findAllActive();
+            List<Semester> semesters = semesterRepository.findAllByActive();
             semesters.forEach(cboSemester::addItem);
 
         } catch (Exception e) {
@@ -208,7 +208,6 @@ public class AdminTeacherGradesPanel extends GradePanel {
                     Average Score: %.2f
                     """,
                     selectedCourse.getName(),
-                    selectedSemester.getCode(),
                     totalStudents,
                     passedStudents,
                     (totalStudents > 0 ? (passedStudents * 100.0 / totalStudents) : 0),

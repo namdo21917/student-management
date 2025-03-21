@@ -9,6 +9,7 @@ import com.study.java.studentmanagement.repository.TeacherRepository;
 import com.study.java.studentmanagement.repository.UserRepository;
 import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -249,11 +250,13 @@ public class UpdateStudentForm extends JDialog {
             }
 
             // Call API to update
-            ResponseEntity<ApiResponse> response = restTemplate.exchange(
-                    "/api/users/" + user.getId(),
+           HttpEntity<User> requestEntity = new HttpEntity<>(user);
+            ResponseEntity<ApiResponse<User>> response = restTemplate.exchange(
+                    "/api/user/update/" + user.getId(),
                     org.springframework.http.HttpMethod.PUT,
-                    user,
-                    ApiResponse.class);
+                    requestEntity,
+                    new org.springframework.core.ParameterizedTypeReference<ApiResponse<User>>() {
+                    });
 
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 showSuccess("Cập nhật sinh viên thành công");

@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -18,17 +19,26 @@ public class Semester {
     @Column(nullable = false)
     private String semester;
 
-    @Column(nullable = false)
+    @Column(name = "group_name", nullable = false)
     private String group;
 
     @Column(nullable = false)
     private String year;
 
-    @Column(name = "is_active", columnDefinition = "boolean default true")
-    private boolean active;
+    @Column(name = "start_date")
+    private LocalDateTime startDate;
 
-    @Column(name = "is_deleted", columnDefinition = "boolean default false")
-    private boolean deleted;
+    @Column(name = "end_date")
+    private LocalDateTime endDate;
+
+    @Column(name = "is_active")
+    private boolean active = false;
+
+    @OneToMany(mappedBy = "semester")
+    private List<Grade> grades;
+
+    @Column(name = "deleted")
+    private boolean deleted = false;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

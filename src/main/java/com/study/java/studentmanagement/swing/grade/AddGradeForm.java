@@ -144,9 +144,9 @@ public class AddGradeForm extends JDialog {
         // Create new grade
         Grade grade = new Grade();
         grade.setStudent(student);
-        grade.setCourse(course);
+        grade.setCourseName(course.getName() == null ? "" : course.getName());
         grade.setSemester(semester);
-        grade.setMidtermScore(midtermScore);
+        grade.setMidScore(midtermScore);
         grade.setFinalScore(finalScore);
 
 

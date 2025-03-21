@@ -19,6 +19,10 @@ public class Grade {
     @JoinColumn(name = "student_id", nullable = false)
     private User student;
 
+    @ManyToOne
+    @JoinColumn(name = "semester_id", nullable = false)
+    private Semester semester;
+
     @Column(name = "course_id", nullable = false)
     private String courseId;
 
