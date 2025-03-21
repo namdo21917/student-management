@@ -3,6 +3,7 @@ package com.study.java.studentmanagement.controller;
 import com.study.java.studentmanagement.dto.grade.GradeRequest;
 import com.study.java.studentmanagement.dto.grade.GradeResponse;
 import com.study.java.studentmanagement.service.GradeService;
+import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,30 +17,34 @@ public class GradeController {
     private final GradeService gradeService;
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<GradeResponse>> getAllGrades() {
-        return ResponseEntity.ok(gradeService.getAllGrades());
+    public ResponseEntity<ApiResponse<List<GradeResponse>>> getAllGrades() {
+        List<GradeResponse> grades = gradeService.getAllGrades();
+        return ResponseEntity.ok(new ApiResponse<>(grades));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GradeResponse> getGradeById(@PathVariable String id) {
-        return ResponseEntity.ok(gradeService.getGradeById(id));
+    public ResponseEntity<ApiResponse<GradeResponse>> getGradeById(@PathVariable String id) {
+        GradeResponse grade = gradeService.getGradeById(id);
+        return ResponseEntity.ok(new ApiResponse<>(grade));
     }
 
     @PostMapping("/create")
-    public ResponseEntity<GradeResponse> createGrade(@RequestBody GradeRequest request) {
-        return ResponseEntity.ok(gradeService.createGrade(request));
+    public ResponseEntity<ApiResponse<GradeResponse>> createGrade(@RequestBody GradeRequest request) {
+        GradeResponse grade = gradeService.createGrade(request);
+        return ResponseEntity.ok(new ApiResponse<>(grade));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<GradeResponse> updateGrade(
+    public ResponseEntity<ApiResponse<GradeResponse>> updateGrade(
             @PathVariable String id,
             @RequestBody GradeRequest request) {
-        return ResponseEntity.ok(gradeService.updateGrade(id, request));
+        GradeResponse grade = gradeService.updateGrade(id, request);
+        return ResponseEntity.ok(new ApiResponse<>(grade));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteGrade(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Void>> deleteGrade(@PathVariable String id) {
         gradeService.deleteGrade(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new ApiResponse<>(null));
     }
 }

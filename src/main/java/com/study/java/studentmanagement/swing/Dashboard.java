@@ -1,15 +1,19 @@
 package com.study.java.studentmanagement.swing;
 
+import com.study.java.studentmanagement.swing.student.StudentPanel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 @Slf4j
+@Component
 public class Dashboard extends JFrame {
+    private final ApplicationContext context;
     private JPanel contentPane;
     private JPanel menuPanel;
     private JPanel mainPanel;
@@ -26,7 +30,9 @@ public class Dashboard extends JFrame {
     private JButton btnTranscript;
     private JButton btnLogout;
 
-    public Dashboard() {
+    @Autowired
+    public Dashboard(ApplicationContext context) {
+        this.context = context;
         initComponents();
         setupListeners();
     }
@@ -53,7 +59,7 @@ public class Dashboard extends JFrame {
         JLabel lblLogo = new JLabel("Student Management");
         lblLogo.setForeground(Color.WHITE);
         lblLogo.setFont(new Font("Arial", Font.BOLD, 16));
-        lblLogo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblLogo.setAlignmentX(CENTER_ALIGNMENT);
         lblLogo.setBorder(new EmptyBorder(20, 0, 20, 0));
         menuPanel.add(lblLogo);
 
@@ -95,17 +101,8 @@ public class Dashboard extends JFrame {
         mainPanel.setLayout(cardLayout);
         contentPane.add(mainPanel, BorderLayout.CENTER);
 
-        // Add panels for each section
+        // Add home panel
         mainPanel.add(createHomePanel(), "HOME");
-        mainPanel.add(createPlaceholderPanel("Students"), "STUDENTS");
-        mainPanel.add(createPlaceholderPanel("Teachers"), "TEACHERS");
-        mainPanel.add(createPlaceholderPanel("Courses"), "COURSES");
-        mainPanel.add(createPlaceholderPanel("Grades"), "GRADES");
-        mainPanel.add(createPlaceholderPanel("Majors"), "MAJORS");
-        mainPanel.add(createPlaceholderPanel("Semesters"), "SEMESTERS");
-        mainPanel.add(createPlaceholderPanel("Transcripts"), "TRANSCRIPTS");
-
-        // Show home panel by default
         cardLayout.show(mainPanel, "HOME");
     }
 
@@ -116,7 +113,7 @@ public class Dashboard extends JFrame {
         button.setFont(new Font("Arial", Font.PLAIN, 14));
         button.setBorderPainted(false);
         button.setFocusPainted(false);
-        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setAlignmentX(CENTER_ALIGNMENT);
         button.setMaximumSize(new Dimension(180, 40));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
@@ -134,8 +131,51 @@ public class Dashboard extends JFrame {
         return button;
     }
 
+    private void setupListeners() {
+        btnHome.addActionListener(e -> cardLayout.show(mainPanel, "HOME"));
+
+        btnStudent.addActionListener(e -> {
+            if (mainPanel.getComponent(0) == null || !mainPanel.getComponent(0).getName().equals("STUDENTS")) {
+                StudentPanel studentPanel = context.getBean(StudentPanel.class);
+                mainPanel.add(studentPanel, "STUDENTS");
+            }
+            cardLayout.show(mainPanel, "STUDENTS");
+        });
+
+        btnTeacher.addActionListener(e -> showPlaceholder("TEACHERS"));
+        btnCourse.addActionListener(e -> showPlaceholder("COURSES"));
+        btnGrade.addActionListener(e -> showPlaceholder("GRADES"));
+        btnMajor.addActionListener(e -> showPlaceholder("MAJORS"));
+        btnSemester.addActionListener(e -> showPlaceholder("SEMESTERS"));
+        btnTranscript.addActionListener(e -> showPlaceholder("TRANSCRIPTS"));
+
+        btnLogout.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Are you sure you want to logout?",
+                    "Confirm Logout",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                this.dispose();
+                SwingUtilities.invokeLater(() -> {
+                    Login loginFrame = new Login(context);
+                    loginFrame.setVisible(true);
+                });
+            }
+        });
+    }
+
+    private void showPlaceholder(String name) {
+        if (mainPanel.getComponent(0) == null || !mainPanel.getComponent(0).getName().equals(name)) {
+            mainPanel.add(createPlaceholderPanel(name), name);
+        }
+        cardLayout.show(mainPanel, name);
+    }
+
     private JPanel createHomePanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        panel.setName("HOME");
         panel.setBackground(Color.WHITE);
 
         // Welcome message
@@ -174,11 +214,11 @@ public class Dashboard extends JFrame {
 
         JLabel titleLabel = new JLabel(title);
         titleLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setAlignmentX(CENTER_ALIGNMENT);
 
         JLabel valueLabel = new JLabel(value);
         valueLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        valueLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        valueLabel.setAlignmentX(CENTER_ALIGNMENT);
 
         card.add(titleLabel);
         card.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -189,6 +229,7 @@ public class Dashboard extends JFrame {
 
     private JPanel createPlaceholderPanel(String title) {
         JPanel panel = new JPanel(new BorderLayout());
+        panel.setName(title);
         panel.setBackground(Color.WHITE);
 
         JLabel label = new JLabel(title + " Management");
@@ -198,29 +239,5 @@ public class Dashboard extends JFrame {
 
         panel.add(label, BorderLayout.NORTH);
         return panel;
-    }
-
-    private void setupListeners() {
-        btnHome.addActionListener(e -> cardLayout.show(mainPanel, "HOME"));
-        btnStudent.addActionListener(e -> cardLayout.show(mainPanel, "STUDENTS"));
-        btnTeacher.addActionListener(e -> cardLayout.show(mainPanel, "TEACHERS"));
-        btnCourse.addActionListener(e -> cardLayout.show(mainPanel, "COURSES"));
-        btnGrade.addActionListener(e -> cardLayout.show(mainPanel, "GRADES"));
-        btnMajor.addActionListener(e -> cardLayout.show(mainPanel, "MAJORS"));
-        btnSemester.addActionListener(e -> cardLayout.show(mainPanel, "SEMESTERS"));
-        btnTranscript.addActionListener(e -> cardLayout.show(mainPanel, "TRANSCRIPTS"));
-
-        btnLogout.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(
-                    this,
-                    "Are you sure you want to logout?",
-                    "Confirm Logout",
-                    JOptionPane.YES_NO_OPTION);
-
-            if (confirm == JOptionPane.YES_OPTION) {
-                this.dispose();
-                new Login().setVisible(true);
-            }
-        });
     }
 }

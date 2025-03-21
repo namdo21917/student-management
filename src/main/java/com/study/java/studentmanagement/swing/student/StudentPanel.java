@@ -52,7 +52,7 @@ public class StudentPanel extends JPanel {
         this.majorRepository = majorRepository;
 
         initializeUI();
-        loadData();
+//        loadData();
     }
 
     private void initializeUI() {

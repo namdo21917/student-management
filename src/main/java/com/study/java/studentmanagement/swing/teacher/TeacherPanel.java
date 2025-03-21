@@ -36,7 +36,7 @@ public class TeacherPanel extends JPanel {
         this.teacherRepository = teacherRepository;
 
         initializeUI();
-        loadData();
+//        loadData();
     }
 
     private void initializeUI() {

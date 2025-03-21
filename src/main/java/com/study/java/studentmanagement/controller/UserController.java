@@ -4,6 +4,7 @@ import com.study.java.studentmanagement.dto.user.UserRequest;
 import com.study.java.studentmanagement.dto.user.UserResponse;
 import com.study.java.studentmanagement.model.User;
 import com.study.java.studentmanagement.service.UserService;
+import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,47 +18,54 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
+        List<UserResponse> users = userService.getAllUsers();
+        return ResponseEntity.ok(new ApiResponse<List<UserResponse>>(users));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable String id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable String id) {
+        UserResponse user = userService.getUserById(id);
+        return ResponseEntity.ok(new ApiResponse<UserResponse>(user));
     }
 
     @PostMapping("/create-user")
-    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
-        return ResponseEntity.ok(userService.createUser(request));
+    public ResponseEntity<ApiResponse<UserResponse>> createUser(@RequestBody UserRequest request) {
+        UserResponse user = userService.createUser(request);
+        return ResponseEntity.ok(new ApiResponse<UserResponse>(user));
     }
 
     @PutMapping("/updateByAdmin/{id}")
-    public ResponseEntity<UserResponse> updateUserByAdmin(
+    public ResponseEntity<ApiResponse<UserResponse>> updateUserByAdmin(
             @PathVariable String id,
             @RequestBody UserRequest request) {
-        return ResponseEntity.ok(userService.updateUserByAdmin(id, request));
+        UserResponse user = userService.updateUserByAdmin(id, request);
+        return ResponseEntity.ok(new ApiResponse<UserResponse>(user));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable String id) {
         userService.deleteUser(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new ApiResponse<Void>(null));
     }
 
     @PutMapping("/restore/{msv}")
-    public ResponseEntity<UserResponse> restoreUser(@PathVariable String msv) {
-        return ResponseEntity.ok(userService.restoreUser(msv));
+    public ResponseEntity<ApiResponse<UserResponse>> restoreUser(@PathVariable String msv) {
+        UserResponse user = userService.restoreUser(msv);
+        return ResponseEntity.ok(new ApiResponse<UserResponse>(user));
     }
 
     @PutMapping("/updateProfile/{id}")
-    public ResponseEntity<UserResponse> updateUserProfile(
+    public ResponseEntity<ApiResponse<UserResponse>> updateUserProfile(
             @PathVariable String id,
             @RequestBody UserRequest request) {
-        return ResponseEntity.ok(userService.updateUserProfile(id, request));
+        UserResponse user = userService.updateUserProfile(id, request);
+        return ResponseEntity.ok(new ApiResponse<UserResponse>(user));
     }
 
-    @PostMapping("/searchStudents")
-    public ResponseEntity<List<UserResponse>> searchStudents(@RequestParam String keyword) {
-        return ResponseEntity.ok(userService.searchStudents(keyword));
+    @GetMapping("/searchStudents")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> searchStudents(@RequestParam String keyword) {
+        List<UserResponse> users = userService.searchStudents(keyword);
+        return ResponseEntity.ok(new ApiResponse<List<UserResponse>>(users));
     }
 }

@@ -3,6 +3,7 @@ package com.study.java.studentmanagement.controller;
 import com.study.java.studentmanagement.dto.course.CourseRequest;
 import com.study.java.studentmanagement.dto.course.CourseResponse;
 import com.study.java.studentmanagement.service.CourseService;
+import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,30 +17,34 @@ public class CourseController {
     private final CourseService courseService;
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<CourseResponse>> getAllCourses() {
-        return ResponseEntity.ok(courseService.getAllCourses());
+    public ResponseEntity<ApiResponse<List<CourseResponse>>> getAllCourses() {
+        List<CourseResponse> courses = courseService.getAllCourses();
+        return ResponseEntity.ok(new ApiResponse<List<CourseResponse>>(courses));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CourseResponse> getCourseById(@PathVariable String id) {
-        return ResponseEntity.ok(courseService.getCourseById(id));
+    public ResponseEntity<ApiResponse<CourseResponse>> getCourseById(@PathVariable String id) {
+        CourseResponse course = courseService.getCourseById(id);
+        return ResponseEntity.ok(new ApiResponse<CourseResponse>(course));
     }
 
     @PostMapping("/add-course")
-    public ResponseEntity<CourseResponse> createCourse(@RequestBody CourseRequest request) {
-        return ResponseEntity.ok(courseService.createCourse(request));
+    public ResponseEntity<ApiResponse<CourseResponse>> createCourse(@RequestBody CourseRequest request) {
+        CourseResponse course = courseService.createCourse(request);
+        return ResponseEntity.ok(new ApiResponse<CourseResponse>(course));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<CourseResponse> updateCourse(
+    public ResponseEntity<ApiResponse<CourseResponse>> updateCourse(
             @PathVariable String id,
             @RequestBody CourseRequest request) {
-        return ResponseEntity.ok(courseService.updateCourse(id, request));
+        CourseResponse course = courseService.updateCourse(id, request);
+        return ResponseEntity.ok(new ApiResponse<CourseResponse>(course));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteCourse(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Void>> deleteCourse(@PathVariable String id) {
         courseService.deleteCourse(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new ApiResponse<Void>(null));
     }
 }

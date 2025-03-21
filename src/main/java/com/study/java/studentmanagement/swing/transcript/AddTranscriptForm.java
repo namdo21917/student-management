@@ -22,7 +22,6 @@ import java.awt.*;
 import java.util.List;
 
 @Slf4j
-@Component
 public class AddTranscriptForm extends JDialog {
     private final RestTemplate restTemplate;
     private final TranscriptRepository transcriptRepository;

@@ -11,7 +11,6 @@ import com.study.java.studentmanagement.service.ApiService;
 import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -19,7 +18,6 @@ import java.awt.*;
 import java.util.List;
 
 @Slf4j
-@Component
 public class UpdateStudentForm extends JDialog {
     private final ApiService apiService;
     private final UserRepository userRepository;

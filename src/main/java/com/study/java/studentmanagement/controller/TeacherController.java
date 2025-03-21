@@ -3,6 +3,7 @@ package com.study.java.studentmanagement.controller;
 import com.study.java.studentmanagement.dto.teacher.TeacherRequest;
 import com.study.java.studentmanagement.dto.teacher.TeacherResponse;
 import com.study.java.studentmanagement.service.TeacherService;
+import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,31 +19,35 @@ public class TeacherController {
     private final TeacherService teacherService;
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<TeacherResponse>> getAllTeachers() {
-        return ResponseEntity.ok(teacherService.getAllTeachers());
+    public ResponseEntity<ApiResponse<List<TeacherResponse>>> getAllTeachers() {
+        List<TeacherResponse> teachers = teacherService.getAllTeachers();
+        return ResponseEntity.ok(new ApiResponse<List<TeacherResponse>>(teachers));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TeacherResponse> getTeacherById(@PathVariable String id) {
-        return ResponseEntity.ok(teacherService.getTeacherById(id));
+    public ResponseEntity<ApiResponse<TeacherResponse>> getTeacherById(@PathVariable String id) {
+        TeacherResponse teacher = teacherService.getTeacherById(id);
+        return ResponseEntity.ok(new ApiResponse<TeacherResponse>(teacher));
     }
 
     @PostMapping("/create-teacher")
-    public ResponseEntity<TeacherResponse> createTeacher(@RequestBody TeacherRequest request) {
-        return ResponseEntity.ok(teacherService.createTeacher(request));
+    public ResponseEntity<ApiResponse<TeacherResponse>> createTeacher(@RequestBody TeacherRequest request) {
+        TeacherResponse teacher = teacherService.createTeacher(request);
+        return ResponseEntity.ok(new ApiResponse<TeacherResponse>(teacher));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<TeacherResponse> updateTeacher(
+    public ResponseEntity<ApiResponse<TeacherResponse>> updateTeacher(
             @PathVariable String id,
             @RequestBody TeacherRequest request) {
-        return ResponseEntity.ok(teacherService.updateTeacher(id, request));
+        TeacherResponse teacher = teacherService.updateTeacher(id, request);
+        return ResponseEntity.ok(new ApiResponse<TeacherResponse>(teacher));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteTeacher(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Void>> deleteTeacher(@PathVariable String id) {
         teacherService.deleteTeacher(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new ApiResponse<Void>(null));
     }
 
     @GetMapping("/search")

@@ -2,20 +2,25 @@ package com.study.java.studentmanagement.swing;
 
 import com.study.java.studentmanagement.util.ValidationUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 @Slf4j
+@Component
 public class Login extends JFrame {
+    private final ApplicationContext context;
     private JTextField txtUsername;
     private JPasswordField txtPassword;
     private JButton btnLogin;
     private JButton btnExit;
 
-    public Login() {
+    @Autowired
+    public Login(ApplicationContext context) {
+        this.context = context;
         initComponents();
         setupListeners();
     }
@@ -76,19 +81,8 @@ public class Login extends JFrame {
     }
 
     private void setupListeners() {
-        btnLogin.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                handleLogin();
-            }
-        });
-
-        btnExit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
+        btnLogin.addActionListener(e -> handleLogin());
+        btnExit.addActionListener(e -> System.exit(0));
     }
 
     private void handleLogin() {
@@ -109,7 +103,6 @@ public class Login extends JFrame {
                     "Login successful!",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
-            // TODO: Open main application window
             openMainWindow();
             this.dispose();
         } else {
@@ -123,7 +116,7 @@ public class Login extends JFrame {
     private void openMainWindow() {
         SwingUtilities.invokeLater(() -> {
             try {
-                Dashboard dashboard = new Dashboard();
+                Dashboard dashboard = context.getBean(Dashboard.class);
                 dashboard.setVisible(true);
             } catch (Exception e) {
                 log.error("Error opening dashboard", e);
@@ -133,5 +126,11 @@ public class Login extends JFrame {
                         JOptionPane.ERROR_MESSAGE);
             }
         });
+    }
+
+    public static Login createLoginFrame(ApplicationContext context) {
+        Login login = new Login(context);
+        login.setVisible(true);
+        return login;
     }
 }

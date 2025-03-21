@@ -3,6 +3,7 @@ package com.study.java.studentmanagement.controller;
 import com.study.java.studentmanagement.dto.semester.SemesterRequest;
 import com.study.java.studentmanagement.dto.semester.SemesterResponse;
 import com.study.java.studentmanagement.service.SemesterService;
+import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,31 +19,35 @@ public class SemesterController {
     private final SemesterService semesterService;
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<SemesterResponse>> getAllSemesters() {
-        return ResponseEntity.ok(semesterService.getAllSemesters());
+    public ResponseEntity<ApiResponse<List<SemesterResponse>>> getAllSemesters() {
+        List<SemesterResponse> semesters = semesterService.getAllSemesters();
+        return ResponseEntity.ok(new ApiResponse<List<SemesterResponse>>(semesters));
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<SemesterResponse> getSemesterById(@PathVariable String id) {
-        return ResponseEntity.ok(semesterService.getSemesterById(id));
+    public ResponseEntity<ApiResponse<SemesterResponse>> getSemesterById(@PathVariable String id) {
+        SemesterResponse semester = semesterService.getSemesterById(id);
+        return ResponseEntity.ok(new ApiResponse<SemesterResponse>(semester));
     }
 
     @PostMapping("/create")
-    public ResponseEntity<SemesterResponse> createSemester(@RequestBody SemesterRequest request) {
-        return ResponseEntity.ok(semesterService.createSemester(request));
+    public ResponseEntity<ApiResponse<SemesterResponse>> createSemester(@RequestBody SemesterRequest request) {
+        SemesterResponse semester = semesterService.createSemester(request);
+        return ResponseEntity.ok(new ApiResponse<SemesterResponse>(semester));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<SemesterResponse> updateSemester(
+    public ResponseEntity<ApiResponse<SemesterResponse>> updateSemester(
             @PathVariable String id,
             @RequestBody SemesterRequest request) {
-        return ResponseEntity.ok(semesterService.updateSemester(id, request));
+        SemesterResponse semester = semesterService.updateSemester(id, request);
+        return ResponseEntity.ok(new ApiResponse<SemesterResponse>(semester));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteSemester(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Void>> deleteSemester(@PathVariable String id) {
         semesterService.deleteSemester(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new ApiResponse<Void>(null));
     }
 
     @GetMapping("/search")
