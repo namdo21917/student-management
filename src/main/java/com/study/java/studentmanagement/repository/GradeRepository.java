@@ -21,44 +21,37 @@ public interface GradeRepository extends JpaRepository<Grade, String> {
 
     List<Grade> findBySemesterId(String semesterId);
 
-    @Query("SELECT g FROM Grade g WHERE g.studentId = ?1 AND g.deleted = false")
-    List<Grade> findActiveGradesByStudentId(String studentId);
-
-    @Query("SELECT AVG(g.totalGrade) FROM Grade g WHERE g.studentId = ?1 AND g.semesterId = ?2 AND g.deleted = false")
-    Double calculateAverageGradeForSemester(String studentId, String semesterId);
-
-    @Query("SELECT COUNT(g) FROM Grade g WHERE g.studentId = ?1 AND g.totalGrade < 4.0 AND g.deleted = false")
-    Long countFailedCourses(String studentId);
-
+    @Query("SELECT g FROM Grade g WHERE g.courseId = ?1 AND g.semester.id = ?2 AND g.deleted = false")
     Page<Grade> findByCourseAndSemester(String courseId, String semesterId, Pageable pageable);
 
-    Page<Grade> findByTeacherId(String teacherId, Pageable pageable);
+    @Query("SELECT g FROM Grade g JOIN Course c ON g.courseId = c.id WHERE c.teacherId = ?1 AND g.deleted = false")
+    Page<Grade> findByCourseTeacherId(String teacherId, Pageable pageable);
 
-    @Query("SELECT AVG(g.averageScore) FROM Grade g WHERE g.course.id = ?1 AND g.semester.id = ?2")
+    @Query("SELECT AVG(g.averageScore) FROM Grade g WHERE g.courseId = ?1 AND g.semester.id = ?2")
     double calculateAverageScoreByCourseAndSemester(String courseId, String semesterId);
 
-    @Query("SELECT COUNT(g) FROM Grade g WHERE g.course.id = ?1 AND g.semester.id = ?2")
+    @Query("SELECT COUNT(g) FROM Grade g WHERE g.courseId = ?1 AND g.semester.id = ?2")
     long countByCourseAndSemester(String courseId, String semesterId);
 
-    @Query("SELECT COUNT(g) FROM Grade g WHERE g.course.id = ?1 AND g.semester.id = ?2 AND g.averageScore >= 5.0")
+    @Query("SELECT COUNT(g) FROM Grade g WHERE g.courseId = ?1 AND g.semester.id = ?2 AND g.averageScore >= 5.0")
     long countPassedStudentsByCourseAndSemester(String courseId, String semesterId);
 
     @Query("SELECT g FROM Grade g WHERE g.deleted = false")
     Page<Grade> findAllActive(Pageable pageable);
 
-    @Query("SELECT g FROM Grade g WHERE g.student.name LIKE %?1% AND g.deleted = false")
+    @Query("SELECT g FROM Grade g WHERE g.student.fullName LIKE %?1% AND g.deleted = false")
     Page<Grade> findByStudentNameContainingIgnoreCase(String studentName, Pageable pageable);
 
-    @Query("SELECT g FROM Grade g WHERE g.course.name LIKE %?1% AND g.deleted = false")
+    @Query("SELECT g FROM Grade g WHERE g.courseName LIKE %?1% AND g.deleted = false")
     Page<Grade> findByCourseNameContainingIgnoreCase(String courseName, Pageable pageable);
 
-    @Query("SELECT g FROM Grade g WHERE g.semester.name LIKE %?1% AND g.deleted = false")
+    @Query("SELECT g FROM Grade g WHERE g.semester.semester LIKE %?1% AND g.deleted = false")
     Page<Grade> findBySemesterNameContainingIgnoreCase(String semesterName, Pageable pageable);
 
     @Query("UPDATE Grade g SET g.deleted = true WHERE g.id = ?1")
     void softDelete(String id);
 
-    @Query("SELECT g FROM Grade g WHERE g.student.name = ?1 AND g.course.name = ?2 AND g.semester.name = ?3 AND g.deleted = false")
+    @Query("SELECT g FROM Grade g WHERE g.student.fullName = ?1 AND g.courseName = ?2 AND g.semester.semester = ?3 AND g.deleted = false")
     Optional<Grade> findByStudentNameAndCourseNameAndSemesterName(String studentName, String courseName,
             String semesterName);
 

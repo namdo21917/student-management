@@ -30,6 +30,9 @@ public class Course {
     @Column(name = "major_name")
     private String majorName;
 
+    @Column(name = "teacher_id")
+    private String teacherId;
+
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean deleted;
 

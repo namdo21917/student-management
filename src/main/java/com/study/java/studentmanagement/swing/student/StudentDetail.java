@@ -20,18 +20,22 @@ public class StudentDetail extends JDialog {
     private final TeacherRepository teacherRepository;
     private final MajorRepository majorRepository;
 
-    public StudentDetail(JFrame parent, User user, TeacherRepository teacherRepository,
-            MajorRepository majorRepository) {
-        super(parent, "Chi tiết sinh viên", true);
+    public StudentDetail(TeacherRepository teacherRepository, MajorRepository majorRepository) {
         this.teacherRepository = teacherRepository;
         this.majorRepository = majorRepository;
+    }
 
-        setSize(500, 500);
-        setLocationRelativeTo(parent);
-        setResizable(false);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
-        initializeUI(user);
+    public static void showDialog(java.awt.Component parent, User user, TeacherRepository teacherRepository,
+            MajorRepository majorRepository) {
+        StudentDetail dialog = new StudentDetail(teacherRepository, majorRepository);
+        dialog.setTitle("Chi tiết sinh viên");
+        dialog.setModal(true);
+        dialog.setSize(500, 500);
+        dialog.setLocationRelativeTo(parent);
+        dialog.setResizable(false);
+        dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        dialog.initializeUI(user);
+        dialog.setVisible(true);
     }
 
     private void initializeUI(User user) {
@@ -144,11 +148,5 @@ public class StudentDetail extends JDialog {
         button.setForeground(Color.WHITE);
         button.setPreferredSize(new Dimension(100, 35));
         return button;
-    }
-
-    public static void showDialog(JFrame parent, User user, TeacherRepository teacherRepository,
-            MajorRepository majorRepository) {
-        StudentDetail dialog = new StudentDetail(parent, user, teacherRepository, majorRepository);
-        dialog.setVisible(true);
     }
 }

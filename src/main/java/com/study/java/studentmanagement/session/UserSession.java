@@ -10,6 +10,14 @@ public class UserSession {
     private static String accessToken;
     private static UserResponse user;
 
+    public static String getAccessToken() {
+        return accessToken;
+    }
+
+    public static UserResponse getUser() {
+        return user;
+    }
+
     public static void setAccessToken(String token) {
         accessToken = token;
     }

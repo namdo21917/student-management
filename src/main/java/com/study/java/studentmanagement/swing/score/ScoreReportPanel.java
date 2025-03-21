@@ -2,10 +2,12 @@ package com.study.java.studentmanagement.swing.score;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLightLaf;
+import com.study.java.studentmanagement.dto.user.UserResponse;
 import com.study.java.studentmanagement.model.Semester;
 import com.study.java.studentmanagement.model.User;
 import com.study.java.studentmanagement.repository.SemesterRepository;
 import com.study.java.studentmanagement.repository.UserRepository;
+import com.study.java.studentmanagement.session.UserSession;
 import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -170,7 +172,14 @@ public class ScoreReportPanel extends JPanel {
 
     private void loadProgramData() {
         try {
-            User currentUser = userRepository.findCurrentUser();
+            UserResponse userResponse = UserSession.getUser();
+            if (userResponse == null) {
+                showError("Không tìm thấy thông tin người dùng");
+                return;
+            }
+
+            User currentUser = userRepository.findById(userResponse.getId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
             if (currentUser != null && currentUser.getMajor() != null) {
                 programComboBox.addItem(currentUser.getMajor().getName());
             }
@@ -185,7 +194,14 @@ public class ScoreReportPanel extends JPanel {
             String selectedSemester = (String) semesterComboBox.getSelectedItem();
             String semesterId = "Tất cả".equals(selectedSemester) ? null : getSemesterIdFromComboBox(selectedSemester);
 
-            User currentUser = userRepository.findCurrentUser();
+            UserResponse userResponse = UserSession.getUser();
+            if (userResponse == null) {
+                showError("Không tìm thấy thông tin người dùng");
+                return;
+            }
+
+            User currentUser = userRepository.findById(userResponse.getId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
             if (currentUser == null) {
                 showError("Không tìm thấy thông tin người dùng");
                 return;

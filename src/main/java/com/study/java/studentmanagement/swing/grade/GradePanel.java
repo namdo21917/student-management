@@ -40,14 +40,14 @@ public class GradePanel extends JPanel {
     private JComboBox<Integer> cboPageSize;
     private JSpinner spnPage;
     private int totalPages;
-    private static final String[] SEARCH_OPTIONS = {"Student", "Course", "Semester"};
-    private static final String[] TABLE_HEADERS = {"Student", "Course", "Semester", "Midterm Score", "Final Score",
-            "Average"};
+    private static final String[] SEARCH_OPTIONS = { "Student", "Course", "Semester" };
+    private static final String[] TABLE_HEADERS = { "Student", "Course", "Semester", "Midterm Score", "Final Score",
+            "Average" };
 
     public GradePanel(GradeRepository gradeRepository,
-                      UserRepository userRepository,
-                      CourseRepository courseRepository,
-                      SemesterRepository semesterRepository) {
+            UserRepository userRepository,
+            CourseRepository courseRepository,
+            SemesterRepository semesterRepository) {
         this.gradeRepository = gradeRepository;
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
@@ -103,7 +103,7 @@ public class GradePanel extends JPanel {
         // Bottom Panel - Pagination
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         lblTotal = new JLabel("Total: 0 grades");
-        cboPageSize = new JComboBox<>(new Integer[]{5, 10, 20, 50});
+        cboPageSize = new JComboBox<>(new Integer[] { 5, 10, 20, 50 });
         spnPage = new JSpinner(new SpinnerNumberModel(1, 1, 1, 1));
 
         bottomPanel.add(new JLabel("Page size:"));
@@ -199,7 +199,7 @@ public class GradePanel extends JPanel {
         try {
             List<User> students = userRepository.findAllStudents();
             List<Course> courses = courseRepository.findAllActive();
-            List<Semester> semesters = semesterRepository.findAllByActive();
+            List<Semester> semesters = semesterRepository.findByActiveTrue();
 
             if (students.isEmpty() || courses.isEmpty() || semesters.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
@@ -298,7 +298,7 @@ public class GradePanel extends JPanel {
         String semesterName = (String) tableModel.getValueAt(selectedRow, 2);
 
         return gradeRepository.findByStudentNameAndCourseNameAndSemesterName(
-                        studentName, courseName, semesterName)
+                studentName, courseName, semesterName)
                 .orElseThrow(() -> new RuntimeException("Grade not found"));
     }
 

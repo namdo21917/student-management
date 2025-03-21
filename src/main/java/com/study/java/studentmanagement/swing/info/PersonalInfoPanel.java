@@ -3,8 +3,10 @@ package com.study.java.studentmanagement.swing.info;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.FlatLaf;
+import com.study.java.studentmanagement.dto.user.UserResponse;
 import com.study.java.studentmanagement.model.User;
 import com.study.java.studentmanagement.repository.UserRepository;
+import com.study.java.studentmanagement.session.UserSession;
 import com.study.java.studentmanagement.util.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -271,7 +273,14 @@ public class PersonalInfoPanel extends JPanel {
 
     public void loadData() {
         try {
-            currentUser = userRepository.findCurrentUser();
+            UserResponse userResponse = UserSession.getUser();
+            if (userResponse == null) {
+                clearTableData();
+                return;
+            }
+
+            currentUser = userRepository.findById(userResponse.getId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
             if (currentUser != null) {
                 updatePersonalInfoTable();
@@ -281,7 +290,7 @@ public class PersonalInfoPanel extends JPanel {
             }
         } catch (Exception e) {
             log.error("Error loading user data", e);
-            showNotification("Lỗi khi tải dữ liệu: " + e.getMessage(), "error");
+            clearTableData();
         }
     }
 

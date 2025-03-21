@@ -12,25 +12,25 @@ import java.util.Optional;
 
 @Repository
 public interface SemesterRepository extends JpaRepository<Semester, String> {
-    Optional<Semester> findBySemesterAndGroupAndYear(String semester, String group, String year);
+        Optional<Semester> findBySemesterAndGroupAndYear(String semester, String group, String year);
 
-    boolean existsBySemesterAndGroupAndYear(String semester, String group, String year);
+        boolean existsBySemesterAndGroupAndYear(String semester, String group, String year);
 
-    List<Semester> findAllByActive();
+        List<Semester> findByActiveTrue();
 
-    Page<Semester> findBySemesterContainingIgnoreCaseOrGroupContainingIgnoreCaseOrYearContainingIgnoreCase(
-            String semester, String group, String year, Pageable pageable);
+        Page<Semester> findBySemesterContainingIgnoreCaseOrGroupContainingIgnoreCaseOrYearContainingIgnoreCase(
+                        String semester, String group, String year, Pageable pageable);
 
-    List<Semester> findByDeletedFalseOrderByCreatedAtDesc();
+        List<Semester> findByDeletedFalseOrderByCreatedAtDesc();
 
-    boolean existsByYearAndSemesterAndGroupAndDeletedFalse(String year, String semester, String group);
+        boolean existsByYearAndSemesterAndGroupAndDeletedFalse(String year, String semester, String group);
 
-    @Query("SELECT s FROM Semester s WHERE s.deleted = false AND " +
-            "(LOWER(s.semester) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(s.group) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(s.year) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    Page<Semester> searchSemesters(String keyword, Pageable pageable);
+        @Query("SELECT s FROM Semester s WHERE s.deleted = false AND " +
+                        "(LOWER(s.semester) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+                        "LOWER(s.group) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+                        "LOWER(s.year) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+        Page<Semester> searchSemesters(String keyword, Pageable pageable);
 
-    @Query("SELECT s FROM Semester s WHERE s.deleted = false AND s.active = true")
-    List<Semester> findActiveSemesters();
+        @Query("SELECT s FROM Semester s WHERE s.deleted = false AND s.active = true")
+        List<Semester> findActiveSemesters();
 }

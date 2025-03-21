@@ -91,7 +91,7 @@ public class AdminTeacherGradesPanel extends GradePanel {
             }
             courses.forEach(cboCourse::addItem);
 
-            List<Semester> semesters = semesterRepository.findAllByActive();
+            List<Semester> semesters = semesterRepository.findByActiveTrue();
             semesters.forEach(cboSemester::addItem);
 
         } catch (Exception e) {
@@ -240,7 +240,7 @@ public class AdminTeacherGradesPanel extends GradePanel {
                         selectedSemester.getId(),
                         PageRequest.of(page, size));
             } else if (!currentUser.isAdmin()) {
-                gradePage = gradeRepository.findByTeacherId(
+                gradePage = gradeRepository.findByCourseTeacherId(
                         currentUser.getId(),
                         PageRequest.of(page, size));
             } else {

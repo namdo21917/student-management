@@ -18,9 +18,6 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
 
     List<Teacher> findByFullNameContainingIgnoreCase(String fullName);
 
-    @Query("SELECT t FROM Teacher t WHERE t.isGV = true AND t.deleted = false")
-    List<Teacher> findAllActiveTeachers();
-
     boolean existsByMgv(String mgv);
 
     boolean existsByEmail(String email);
