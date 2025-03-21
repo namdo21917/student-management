@@ -37,20 +37,16 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     boolean existsByEmail(String email);
 
-    @Query("SELECT COUNT(u) FROM User u WHERE u.majorId = ?1 AND u.deleted = false")
+    @Query("SELECT COUNT(u) FROM User u WHERE u.major.id = ?1 AND u.deleted = false")
     Long countStudentsByMajor(String majorId);
 
-    @Query("SELECT u FROM User u WHERE u.majorId = ?1 AND u.deleted = false")
+    @Query("SELECT u FROM User u WHERE u.major.id = ?1 AND u.deleted = false")
     Page<User> findStudentsByMajor(String majorId, Pageable pageable);
-
-    Optional<User> findByUsername(String username);
-
-    boolean existsByUsername(String username);
 
     @Query("SELECT u FROM User u WHERE u.username = ?#{@securityService.getCurrentUsername()}")
     User findCurrentUser();
 
-    @Query("SELECT u FROM User u WHERE u.role = 'STUDENT' AND u.deleted = false")
+    @Query("SELECT u FROM User u WHERE u.isAdmin = false AND u.isGV = false AND u.deleted = false")
     List<User> findAllStudents();
 
     List<User> findByFullNameContainingIgnoreCaseOrMsvContainingIgnoreCase(String fullName, String msv);

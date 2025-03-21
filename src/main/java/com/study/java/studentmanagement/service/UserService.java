@@ -3,7 +3,9 @@ package com.study.java.studentmanagement.service;
 import com.study.java.studentmanagement.dto.user.UserRequest;
 import com.study.java.studentmanagement.dto.user.UserResponse;
 import com.study.java.studentmanagement.model.User;
+import com.study.java.studentmanagement.model.Major;
 import com.study.java.studentmanagement.repository.UserRepository;
+import com.study.java.studentmanagement.repository.MajorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final MajorRepository majorRepository;
 
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
@@ -77,7 +80,12 @@ public class UserService {
         user.setGender(request.getGender());
         user.setClassName(request.getClassName());
         user.setEmail(request.getEmail());
-        user.setMajorId(request.getMajorId());
+        if (request.getMajorId() != null) {
+            Major major = majorRepository.findById(request.getMajorId())
+                    .orElseThrow(() -> new RuntimeException("Major not found"));
+            user.setMajor(major);
+            user.setMajorName(major.getName());
+        }
         user.setPhone(request.getPhone());
         user.setCountry(request.getCountry());
         user.setAddress(request.getAddress());
@@ -99,7 +107,7 @@ public class UserService {
         response.setMsv(user.getMsv());
         response.setFullName(user.getFullName());
         response.setGender(user.getGender());
-        response.setMajorId(user.getMajorId());
+        response.setMajorId(user.getMajor() != null ? user.getMajor().getId() : null);
         response.setYear(user.getYear());
         response.setClassName(user.getClassName());
         response.setAdmin(user.isAdmin());

@@ -206,7 +206,7 @@ public class UpdateStudentForm extends JDialog {
             majorComboBox.removeAllItems();
             for (Major major : majors) {
                 majorComboBox.addItem(major.getName());
-                if (major.getId().equals(user.getMajorId())) {
+                if (user.getMajor() != null && major.getId().equals(user.getMajor().getId())) {
                     majorComboBox.setSelectedItem(major.getName());
                 }
             }
@@ -244,13 +244,14 @@ public class UpdateStudentForm extends JDialog {
             String selectedMajorName = (String) majorComboBox.getSelectedItem();
             for (Major major : majors) {
                 if (major.getName().equals(selectedMajorName)) {
-                    user.setMajorId(major.getId());
+                    user.setMajor(major);
+                    user.setMajorName(major.getName());
                     break;
                 }
             }
 
             // Call API to update
-           HttpEntity<User> requestEntity = new HttpEntity<>(user);
+            HttpEntity<User> requestEntity = new HttpEntity<>(user);
             ResponseEntity<ApiResponse<User>> response = restTemplate.exchange(
                     "/api/user/update/" + user.getId(),
                     org.springframework.http.HttpMethod.PUT,

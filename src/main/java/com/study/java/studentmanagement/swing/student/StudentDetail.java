@@ -64,7 +64,7 @@ public class StudentDetail extends JDialog {
         addSeparator(contentPanel, gbc, 13);
 
         // Add major information
-        String majorName = getMajorName(user.getMajorId());
+        String majorName = user.getMajor() != null ? user.getMajor().getName() : "Không xác định";
         addLabelAndValue(contentPanel, "Chuyên ngành:", majorName, gbc, 14);
         addSeparator(contentPanel, gbc, 15);
 

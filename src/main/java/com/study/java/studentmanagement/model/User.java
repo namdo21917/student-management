@@ -33,9 +33,6 @@ public class User {
 
     private String gender;
 
-    @Column(name = "major_id")
-    private String majorId;
-
     @Column(name = "major_name")
     private String majorName;
 
@@ -67,7 +64,7 @@ public class User {
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean deleted;
 
-    @OneToMany(mappedBy = "studentId", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
     private List<Grade> grades;
 
     @ManyToOne(fetch = FetchType.LAZY)

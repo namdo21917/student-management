@@ -234,7 +234,7 @@ public class AddStudentForm extends JDialog {
             String selectedMajorName = (String) majorComboBox.getSelectedItem();
             for (Major major : majors) {
                 if (major.getName().equals(selectedMajorName)) {
-                    user.setMajorId(major.getId());
+                    user.setMajor(major);
                     break;
                 }
             }

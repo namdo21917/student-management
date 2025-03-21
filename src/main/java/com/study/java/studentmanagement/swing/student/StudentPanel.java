@@ -25,6 +25,8 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -45,7 +47,7 @@ public class StudentPanel extends JPanel {
     private List<Teacher> teachers;
 
     public StudentPanel(RestTemplate restTemplate, UserRepository userRepository,
-                        TeacherRepository teacherRepository, MajorRepository majorRepository) {
+            TeacherRepository teacherRepository, MajorRepository majorRepository) {
         this.restTemplate = restTemplate;
         this.userRepository = userRepository;
         this.teacherRepository = teacherRepository;
@@ -197,6 +199,19 @@ public class StudentPanel extends JPanel {
     }
 
     private List<User> convertToUsers(List<UserResponse> userResponses) {
+        // Collect all majorIds first
+        List<String> majorIds = userResponses.stream()
+                .map(UserResponse::getMajorId)
+                .distinct()
+                .toList();
+
+        // Fetch all majors in one query
+        List<Major> majors = majorRepository.findAllById(majorIds);
+
+        // Create a map for quick lookup
+        Map<String, Major> majorMap = majors.stream()
+                .collect(Collectors.toMap(Major::getId, major -> major));
+
         List<User> users = new ArrayList<>();
         for (UserResponse response : userResponses) {
             User user = new User();
@@ -205,7 +220,14 @@ public class StudentPanel extends JPanel {
             user.setMsv(response.getMsv());
             user.setEmail(response.getEmail());
             user.setGvcn(response.getGvcn());
-            user.setMajorId(response.getMajorId());
+
+            // Get major from map instead of querying repository
+            Major major = majorMap.get(response.getMajorId());
+            user.setMajor(major);
+            if (major != null) {
+                user.setMajorName(major.getName());
+            }
+
             user.setClassName(response.getClassName());
             user.setDeleted(response.isDeleted());
             users.add(user);
@@ -294,8 +316,8 @@ public class StudentPanel extends JPanel {
     }
 
     private class StudentsTableModel extends AbstractTableModel {
-        private final String[] columnNames = {"STT", "Tên", "Mã sinh viên", "GVCN", "Chuyên ngành", "Lớp",
-                "Hành động"};
+        private final String[] columnNames = { "STT", "Tên", "Mã sinh viên", "GVCN", "Chuyên ngành", "Lớp",
+                "Hành động" };
         private List<User> students = new ArrayList<>();
 
         public void setStudents(List<User> students) {
@@ -317,17 +339,7 @@ public class StudentPanel extends JPanel {
         public Object getValueAt(int rowIndex, int columnIndex) {
             User student = students.get(rowIndex);
 
-            String majorName = majors.stream()
-                    .filter(major -> major.getId().equals(student.getMajorId()))
-                    .map(Major::getName)
-                    .findFirst()
-                    .orElse("");
-
-            String gvcnName = teachers.stream()
-                    .filter(teacher -> teacher.getId().equals(student.getGvcn()))
-                    .map(Teacher::getFullName)
-                    .findFirst()
-                    .orElse("");
+            String majorName = student.getMajor() != null ? student.getMajor().getName() : "";
 
             switch (columnIndex) {
                 case 0:
@@ -337,15 +349,15 @@ public class StudentPanel extends JPanel {
                 case 2:
                     return student.getMsv();
                 case 3:
-                    return gvcnName;
+                    return student.getGvcn();
                 case 4:
                     return majorName;
                 case 5:
                     return student.getClassName();
                 case 6:
-                    return "Hành động";
+                    return "Xem, Sửa, Xóa";
                 default:
-                    throw new IllegalArgumentException("Invalid column index");
+                    return null;
             }
         }
 
@@ -363,7 +375,7 @@ public class StudentPanel extends JPanel {
     private class ActionRenderer extends DefaultTableCellRenderer {
         @Override
         public java.awt.Component getTableCellRendererComponent(JTable table, Object value,
-                                                                boolean isSelected, boolean hasFocus, int row, int column) {
+                boolean isSelected, boolean hasFocus, int row, int column) {
             JLabel label = new JLabel("Tùy chọn");
             label.setHorizontalAlignment(JLabel.CENTER);
             if (isSelected) {
@@ -388,7 +400,7 @@ public class StudentPanel extends JPanel {
 
         @Override
         public java.awt.Component getTableCellEditorComponent(JTable table, Object value,
-                                                              boolean isSelected, int row, int column) {
+                boolean isSelected, int row, int column) {
             currentStudent = studentsTableModel.students.get(row);
 
             JPopupMenu popup = new JPopupMenu();

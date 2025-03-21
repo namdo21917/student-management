@@ -5,6 +5,7 @@ import com.study.java.studentmanagement.dto.login.LoginResponse;
 import com.study.java.studentmanagement.dto.login.TokenResponse;
 import com.study.java.studentmanagement.dto.teacher.TeacherResponse;
 import com.study.java.studentmanagement.dto.user.UserResponse;
+import com.study.java.studentmanagement.model.Major;
 import com.study.java.studentmanagement.model.Teacher;
 import com.study.java.studentmanagement.model.User;
 import com.study.java.studentmanagement.repository.TeacherRepository;
@@ -48,7 +49,7 @@ public class AuthService {
         userResponse.setMsv(user.getMsv());
         userResponse.setFullName(user.getFullName());
         userResponse.setGender(user.getGender());
-        userResponse.setMajorId(user.getMajorId());
+        userResponse.setMajorId(user.getMajor().getId());
         userResponse.setYear(user.getYear());
         userResponse.setClassName(user.getClassName());
         userResponse.setAdmin(user.isAdmin());
@@ -76,7 +77,7 @@ public class AuthService {
         response.setMsv(user.getMsv());
         response.setFullName(user.getFullName());
         response.setGender(user.getGender());
-        response.setMajorId(user.getMajorId());
+        response.setMajorId(user.getMajor().getId());
         response.setYear(user.getYear());
         response.setClassName(user.getClassName());
         response.setAdmin(user.isAdmin());
