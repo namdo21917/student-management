@@ -75,8 +75,9 @@ public class TeacherService {
         teacher.setMgv(request.getMgv());
         teacher.setFullName(request.getFullName());
         teacher.setEmail(request.getEmail());
-        teacher.setAdmin(request.isAdmin());
-        teacher.setGv(request.isGV());
+        teacher.setAdmin(request.getIsAdmin());
+        teacher.setGv(request.getIsGV());
+        teacher.setPassword(request.getPassword());
     }
 
     private TeacherResponse convertToResponse(Teacher teacher) {

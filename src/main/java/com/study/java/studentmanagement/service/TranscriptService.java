@@ -11,6 +11,7 @@ import com.study.java.studentmanagement.repository.SemesterRepository;
 import com.study.java.studentmanagement.repository.TranscriptRepository;
 import com.study.java.studentmanagement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class TranscriptService {
     private final TranscriptRepository transcriptRepository;
     private final UserRepository userRepository;
     private final SemesterRepository semesterRepository;
-
+    @Autowired
     public List<TranscriptResponse> getAllTranscripts() {
         return transcriptRepository.findAll().stream()
                 .map(this::convertToResponse)

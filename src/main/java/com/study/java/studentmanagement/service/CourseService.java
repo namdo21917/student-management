@@ -52,6 +52,7 @@ public class CourseService {
         course.setCode(request.getCode());
         course.setCredit(request.getCredit());
         course.setMajorId(request.getMajorId());
+        course.setMajorName(request.getMajorName());
     }
 
     private CourseResponse convertToResponse(Course course) {

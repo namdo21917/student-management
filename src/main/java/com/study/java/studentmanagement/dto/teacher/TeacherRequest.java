@@ -7,6 +7,7 @@ public class TeacherRequest {
     private String mgv;
     private String fullName;
     private String email;
-    private boolean isAdmin;
-    private boolean isGV;
+    private Boolean isAdmin;
+    private Boolean isGV;
+    private String password;
 }

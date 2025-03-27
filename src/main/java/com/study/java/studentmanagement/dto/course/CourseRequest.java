@@ -8,4 +8,5 @@ public class CourseRequest {
     private String code;
     private int credit;
     private String majorId;
+    private String majorName;
 }

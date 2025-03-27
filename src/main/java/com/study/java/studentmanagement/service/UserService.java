@@ -90,6 +90,10 @@ public class UserService {
         user.setCountry(request.getCountry());
         user.setAddress(request.getAddress());
         user.setDob(request.getDob());
+        user.setGV(request.getIsGV());
+
+        user.setAdmin(request.getIsAdmin());
+
     }
 
     private void updateUserProfileFromRequest(User user, UserRequest request) {

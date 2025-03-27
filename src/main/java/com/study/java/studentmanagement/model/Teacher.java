@@ -21,6 +21,8 @@ public class Teacher {
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
+    @Column(name = "password", nullable = false)
+    private String password;
     @Column
     private String email;
 
@@ -45,4 +47,5 @@ public class Teacher {
     public String toString() {
         return fullName;
     }
+
 }

@@ -10,6 +10,7 @@ public class AuthResponse {
     private TokenResponse tokens;
     private UserResponse user;
     private TeacherResponse teacherData;
+
     private boolean isTeacher;
 
     public void setTeacher(boolean isTeacher) {
