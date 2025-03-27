@@ -33,6 +33,8 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     List<User> findByYear(String year);
 
+    Long countAllByActive(boolean active);
+
     boolean existsByMsv(String msv);
 
     boolean existsByEmail(String email);
