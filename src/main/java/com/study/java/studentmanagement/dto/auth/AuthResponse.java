@@ -11,13 +11,4 @@ public class AuthResponse {
     private UserResponse user;
     private TeacherResponse teacherData;
 
-    private boolean isTeacher;
-
-    public void setTeacher(boolean isTeacher) {
-        this.isTeacher = isTeacher;
-    }
-
-    public void setTeacher(TeacherResponse teacher) {
-        this.teacherData = teacher;
-    }
 }

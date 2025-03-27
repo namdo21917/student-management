@@ -58,9 +58,6 @@ public class User {
     @Column(name = "is_admin", columnDefinition = "boolean default false")
     private boolean isAdmin;
 
-    @Column(name = "is_gv", columnDefinition = "boolean default false")
-    private boolean isGV;
-
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean deleted;
 
