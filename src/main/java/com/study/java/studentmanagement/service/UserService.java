@@ -90,7 +90,6 @@ public class UserService {
         user.setCountry(request.getCountry());
         user.setAddress(request.getAddress());
         user.setDob(request.getDob());
-        user.setGV(request.getIsGV());
 
         user.setAdmin(request.getIsAdmin());
 
@@ -118,7 +117,6 @@ public class UserService {
         response.setGvcn(user.getGvcn());
         response.setGvcnName(user.getGvcnName());
         response.setDeleted(user.isDeleted());
-        response.setGV(user.isGV());
         response.setEmail(user.getEmail());
         response.setDob(user.getDob());
         response.setPhone(user.getPhone());

@@ -130,7 +130,6 @@ public class StatisticService {
         response.setGvcn(user.getGvcn());
         response.setGvcnName(user.getGvcnName());
         response.setDeleted(user.isDeleted());
-        response.setGV(user.isGV());
         response.setEmail(user.getEmail());
         response.setDob(user.getDob());
         response.setPhone(user.getPhone());
