@@ -20,7 +20,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     List<User> findByGvcn(String gvcn);
 
-    @Query("SELECT u FROM User u WHERE u.deleted = false AND u.isAdmin = false AND u.isGV = false")
+    @Query("SELECT u FROM User u WHERE u.deleted = false AND u.isAdmin = false")
     Page<User> findAllActiveStudents(Pageable pageable);
 
     @Query("SELECT u FROM User u WHERE u.deleted = false AND " +
@@ -45,8 +45,7 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("SELECT u FROM User u WHERE u.major.id = ?1 AND u.deleted = false")
     Page<User> findStudentsByMajor(String majorId, Pageable pageable);
 
-
-    @Query("SELECT u FROM User u WHERE u.isAdmin = false AND u.isGV = false AND u.deleted = false")
+    @Query("SELECT u FROM User u WHERE u.isAdmin = false AND u.deleted = false")
     List<User> findAllStudents();
 
     List<User> findByFullNameContainingIgnoreCaseOrMsvContainingIgnoreCase(String fullName, String msv);
