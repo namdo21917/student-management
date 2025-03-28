@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final MajorRepository majorRepository;
+    private final MajorService majorService;
 
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
@@ -90,9 +91,7 @@ public class UserService {
         user.setCountry(request.getCountry());
         user.setAddress(request.getAddress());
         user.setDob(request.getDob());
-
-        user.setAdmin(request.getIsAdmin());
-
+        user.setGvcnName(request.getGvcnName());
     }
 
     private void updateUserProfileFromRequest(User user, UserRequest request) {
@@ -105,6 +104,8 @@ public class UserService {
     }
 
     private UserResponse convertToResponse(User user) {
+        Major major = majorRepository.findById(user.getMajor().getId()).orElse(new Major());
+
         UserResponse response = new UserResponse();
         response.setId(user.getId());
         response.setMsv(user.getMsv());
@@ -122,6 +123,7 @@ public class UserService {
         response.setPhone(user.getPhone());
         response.setCountry(user.getCountry());
         response.setAddress(user.getAddress());
+        response.setMajor(majorService.convertToResponse(major));
         return response;
     }
 }

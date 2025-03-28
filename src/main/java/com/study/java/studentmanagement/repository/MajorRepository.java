@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface MajorRepository extends JpaRepository<Major, String> {
     Optional<Major> findByCode(String code);
 
+    Optional<Major> findById(String id);
+
     List<Major> findByNameContainingIgnoreCase(String name);
 
     boolean existsByCode(String code);

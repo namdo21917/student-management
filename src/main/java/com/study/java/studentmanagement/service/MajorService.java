@@ -75,7 +75,7 @@ public class MajorService {
         major.setActive(request.isActive());
     }
 
-    private MajorResponse convertToResponse(Major major) {
+    public MajorResponse convertToResponse(Major major) {
         MajorResponse response = new MajorResponse();
         response.setId(major.getId());
         response.setName(major.getName());

@@ -17,6 +17,5 @@ public class UserRequest {
     private String country;
     private String address;
     private String dob;
-    private Boolean isGV;
-    private Boolean isAdmin;
+    private String gvcnName;
 }

@@ -1,5 +1,6 @@
 package com.study.java.studentmanagement.dto.user;
 
+import com.study.java.studentmanagement.dto.major.MajorResponse;
 import lombok.Data;
 
 @Data
@@ -21,4 +22,6 @@ public class UserResponse {
     private String phone;
     private String country;
     private String address;
+
+    MajorResponse major;
 }
